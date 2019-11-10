@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "empregado.h"
-#include "dependente.h"
 #include "hash.h"
 
 int main(int argc, char *argv[]){
