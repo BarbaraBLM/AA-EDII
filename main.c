@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
 		double salario;
 		int end;
 
-		printf("1. Cadastrar Empregado\n2. Cadastrar Dependente\n3.Buscar\n4.Modificar\n5.Sair\nDigite uma opção: ");
+		printf("1. Cadastrar Empregado\n2. Cadastrar Dependente\n3. Buscar\n4. Modificar\n5. Sair\nDigite uma opção: ");
 		scanf("%d", &op);
 		fflush(stdin);
 		switch (op){
@@ -52,12 +52,12 @@ int main(int argc, char *argv[]){
 				printf("Não implementado ainda!\n");
 				break;
 			case 3 :
-				printf("1. Buscar Empregado\n2. Buscar Dependente\n3.Voltar\nDigite uma opção: ");
+				printf("1. Buscar Empregado\n2. Buscar Dependente\n3. Voltar\nDigite uma opção: ");
 				scanf("%d", &op);
 				fflush(stdin);
 				switch (op){
 					case 1 :
-						printf("1. Buscar Codigo\n2. Buscar Nome\n3. Buscar Idade\n4. Buscar Salario\n5. Buscar Número de Dependente\n6.Voltar\nDigite uma opção: ");
+						printf("1. Buscar Codigo\n2. Buscar Nome\n3. Buscar Idade\n4. Buscar Salario\n5. Buscar Número de Dependente\n6. Voltar\nDigite uma opção: ");
 						scanf("%d", &op);
 						fflush(stdin);
 						switch (op){
