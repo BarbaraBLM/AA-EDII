@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "dependente.c"
-#include "empregado.c"
-#define fbMax 1.1
+#include "dependente.h"
+#include "empregado.h"
 
 void expandHash(FILE *h, FILE *r, int tam, int* p, int l);
 
@@ -66,7 +65,7 @@ void inserirHash(FILE *h, FILE *r, FILE *exclusao, Empregado *emp, int tam, int 
 			salva_empreg(emp, r);
 			fseek(h, chave*sizeof(int), SEEK_SET);
 			fwrite(&excl, sizeof(int), 1, h);
-			fseek(excl, end_excl*sizeof(int), SEEK_SET);
+			fseek(exclusao, end_excl*sizeof(int), SEEK_SET);
 			fwrite(&end_excl, sizeof(int), 1, exclusao);
 		}
 		else{
@@ -93,7 +92,7 @@ void inserirHash(FILE *h, FILE *r, FILE *exclusao, Empregado *emp, int tam, int 
 			emp_aux->prox = excl;
 			fseek(r, end_atual*tamanhoEmpregado(), SEEK_SET);
 			salva_empreg(emp_aux, r);
-			fseek(excl, end_excl*sizeof(int), SEEK_SET);
+			fseek(exclusao, end_excl*sizeof(int), SEEK_SET);
 			fwrite(&end_excl, sizeof(int), 1, exclusao);
 		}
 		else{
@@ -181,7 +180,7 @@ void expandHash(FILE *h, FILE *r, int tam, int* p, int l){
 	*p+=1;
 }
 
-int busca_por_cod(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorna o endereço do arquivo de registros
+int buscarCod(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorna o endereço do arquivo de registros
 	int end_atual;
 	int chave = hash(cod, tam, l);
 	Empregado* emp;
@@ -190,14 +189,14 @@ int busca_por_cod(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retor
 	fread(&end_atual, sizeof(int), 1, h);
 	fseek(regts, end_atual*tamanhoEmpregado(), SEEK_SET);
 	emp = le_empreg(regts);
-	if(emp->cod == cod)
+	if(emp->cod == cod && emp->status == 1)
 		return end_atual;
 	else{
 		while(emp->prox != -1){
 			fseek(regts, emp->prox*tamanhoEmpregado(), SEEK_SET);
 			end_atual = emp->prox;
 			emp = le_empreg(regts);
-			if(emp->cod == cod)
+			if(emp->cod == cod && emp->status == 1)
 				return end_atual;
 		}
 	}
@@ -207,14 +206,14 @@ int busca_por_cod(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retor
 		fread(&end_atual, sizeof(int), 1, h);
 		fseek(regts, end_atual*tamanhoEmpregado(), SEEK_SET);
 		emp = le_empreg(regts);
-		if(emp->cod == cod)
+		if(emp->cod == cod && emp->status == 1)
 			return end_atual;
 		else{
 			while(emp->prox != -1){
 				fseek(regts, emp->prox*tamanhoEmpregado(), SEEK_SET);
 				end_atual = emp->prox;
 				emp = le_empreg(regts);
-				if(emp->cod == cod)
+				if(emp->cod == cod && emp->status == 1)
 					return end_atual;
 			}
 		}
@@ -270,14 +269,14 @@ void excluirHash(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int 
     	fseek(r, aux*tamanhoEmpregado(), SEEK_SET);
     	prox = le_empreg(r);
     	end_ant = aux;
-    	while(prox->prox != -1 && prox->prox != end){
+    	while(prox->prox != -1 && prox->prox != end){ //Procura o anterior ao registro a ser excluido
 			fseek(r, emp->prox*tamanhoEmpregado(), SEEK_SET);
 			end_ant = emp->prox;
 			prox = le_empreg(r);
 		}
-		if(prox->prox != -1){
+		if(prox->prox != -1){ //Caso encontrei
 			rewind(exclusao);
-	    	for (int i = 0; fread(&aux, sizeof(int), 1, exclusao) != 0; ++i){
+	    	for (int i = 0; fread(&aux, sizeof(int), 1, exclusao) != 0; ++i){ //Verifica se 
 	    		if(aux == -1){
 	    			excl = i;
 	    			break;
@@ -305,7 +304,7 @@ void excluirHash(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int 
 	    	}
     	}
     }
-    if(chave < p){ //Caso a hash já tenha extendido e o registro se encontra na extensão
+    if(chave < p){ //Caso a hash já tenha extendido e o registro se encontra na extensão oq muda é a chave calculada com l+1
     	chave = hash(emp->cod, tam, l+1);
 
 	    fseek(h, chave*sizeof(int), SEEK_SET);
@@ -443,48 +442,3 @@ int excluirHash(FILE *h, FILE *r, FILE *exclusao, int emp, int tam, int* p, int 
     return 0;
 }
 */
-
-int main(){
-	int tamHash = 2, l = 0, qtd_registros = 0, p = 0, aux = -1;
-	FILE *hash = fopen("hash.dat","w+b");
-	FILE *regts = fopen("registros.dat","w+b");
-	FILE *excl = fopen("exclusao.dat","w+b");
-	Empregado *emp[3];
-
-	initHash(hash, tamHash);
-	fwrite(&aux, sizeof(int), 1, excl);
-    
-    emp[0] = criarEmpregado("x", 18, 100);
-    emp[1] = criarEmpregado("y", 17, 100);
-    emp[2] = criarEmpregado("z", 16, 100);
-    imprime_empreg(emp[0]);
-    imprime_empreg(emp[1]);
-    imprime_empreg(emp[2]);
-    
-    printf("\n HASH: \n");
-    imprimeHash(hash);
-    
-	inserirHash(hash, regts, excl, emp[0], tamHash, &p, l, &qtd_registros);
-	inserirHash(hash, regts, excl, emp[1], tamHash, &p, l, &qtd_registros);
-	inserirHash(hash, regts, excl, emp[2], tamHash, &p, l, &qtd_registros);
-    printf(" Nova Hash: \n");
-	//imprimeHash(hash);
-    
-    printf("  Última pos :\n");
-    fseek(regts, 0, SEEK_END);
-    fseek(regts, -tamanhoEmpregado(), SEEK_CUR);
-    imprime_empreg(le_empreg(regts));
-    
-    //printf("Arq r:\n");
-    //imprime_reg(regts);
-    //printf(" Fim arq r\n");
-	//percorrendo_lista(hash, regts, 1);
-
-    printf("Excluindo reg na pos 1 (cod = 2) : %d\n", excluirHash(hash, regts, excl, 1, tamHash, &p, l, &qtd_registros));
-    
-    imprimeHash(hash);
-    
-    fclose(hash);    fclose(regts);    fclose(excl);
-    
-	return 0;
-}
