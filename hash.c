@@ -51,9 +51,10 @@ void percorrendo_lista(FILE* h, FILE* reg, int r_hash){
 
 void inserirHash(FILE *h, FILE *r, FILE *exclusao, Empregado *emp, int tam, int l, int *qtd_registros){
 	int chave = hash(emp->cod, tam, l);
-	int excl, aux;
+	int excl, aux, end_excl = -1;
 	rewind(exclusao);
 	while(fread(&excl, sizeof(int), 1, exclusao) != 0){ //Procurar caso tenha algum registro excluido
+		end_excl++;
 		if(excl != -1) break;
 	}
 	fseek(h, chave*sizeof(int), SEEK_SET);
@@ -65,6 +66,8 @@ void inserirHash(FILE *h, FILE *r, FILE *exclusao, Empregado *emp, int tam, int 
 			salva_empreg(emp, r);
 			fseek(h, chave*sizeof(int), SEEK_SET);
 			fwrite(&excl, sizeof(int), 1, h);
+			fseek(excl, end_excl*sizeof(int), SEEK_SET);
+			fwrite(&end_excl, sizeof(int), 1, exclusao);
 		}
 		else{
 			fseek(r, 0, SEEK_END);
@@ -90,6 +93,8 @@ void inserirHash(FILE *h, FILE *r, FILE *exclusao, Empregado *emp, int tam, int 
 			emp_aux->prox = excl;
 			fseek(r, end_atual*tamanhoEmpregado(), SEEK_SET);
 			salva_empreg(emp_aux, r);
+			fseek(excl, end_excl*sizeof(int), SEEK_SET);
+			fwrite(&end_excl, sizeof(int), 1, exclusao);
 		}
 		else{
 			fseek(r, 0, SEEK_END);
