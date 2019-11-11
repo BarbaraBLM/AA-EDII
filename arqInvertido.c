@@ -203,7 +203,7 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
 	}
 	
 	//NOME 1-----------------------------------------
-	qsort_nome(regs, qtd_registros); //Organiza por idade
+	qsort_nome(regs, qtd_registros); //Ordena por idade
 
 	for (int i = 0; i < qtd_registros; ++i){ //Organiza os ponteiros e cria o A5-Nome
 		if(i < (qtd_registros-1) && strcmp(regs[i]->emp->nome, regs[i+1]->emp->nome) == 0 && regs[i]->emp->status == 1 && regs[i+1]->emp->status == 1){
@@ -241,7 +241,7 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
     printf("\n\n");
     
 	//IDADE 2----------------------------------------
-	qsort_idade(regs, qtd_registros); //Organiza por idade
+	qsort_idade(regs, qtd_registros); //Ordena por idade
 
 	for (int i = 0; i < qtd_registros; ++i){ //Organiza os ponteiros e cria o A5-idade
 		if(i < (qtd_registros-1) && regs[i]->emp->idade == regs[i+1]->emp->idade && regs[i]->emp->status == 1 && regs[i+1]->emp->status == 1){
@@ -281,9 +281,9 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
     printf("\n\n");
 
     //SALARIOOOOOOOOO 3----------------------------------
-    qsort_salario(regs, qtd_registros); //Organiza por Salario
+    qsort_salario(regs, qtd_registros); //Ordena por Salario
 
-	for (int i = 0; i < qtd_registros; ++i){ //Organiza os ponteiros e cria o A5-SALARIO
+	for (int i = 0; i < qtd_registros; ++i){ //Organiza os ponteiros e cria o A5-Salario
 		if(i < (qtd_registros-1) && regs[i]->emp->salario == regs[i+1]->emp->salario && regs[i]->emp->status == 1 && regs[i+1]->emp->status == 1){
 			for (int j = i+1; j < qtd_registros; ++j){
 				if(regs[i]->emp->salario == regs[j]->emp->salario && regs[i]->emp->status == 1 && regs[j]->emp->status == 1){
@@ -317,9 +317,9 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
     printf("\n\n");
 
     //DEPENDENTES 4-----------------------------------
-    qsort_ndependentes(regs, qtd_registros); //Organiza por Salario
+    qsort_ndependentes(regs, qtd_registros); //Organiza por dependentes
 
-	for (int i = 0; i < qtd_registros; ++i){ //Organiza os ponteiros e cria o A5-SALARIO
+	for (int i = 0; i < qtd_registros; ++i){ //Organiza os ponteiros e cria o A5-Ndependents
 		if(i < (qtd_registros-1) && regs[i]->emp->n_dependentes == regs[i+1]->emp->n_dependentes && regs[i]->emp->status == 1 && regs[i+1]->emp->status == 1){
 			for (int j = i+1; j < qtd_registros; ++j){
 				if(regs[i]->emp->n_dependentes == regs[j]->emp->n_dependentes && regs[i]->emp->status == 1 && regs[j]->emp->status == 1){
@@ -355,7 +355,7 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
 	qsort_cp(regs, qtd_registros);
 	
 	//A8
-	for (int i = 0; i < qtd_registros; ++i){ //lê todos os dados para a memoria principal
+	for (int i = 0; i < qtd_registros; ++i){ 
 		fwrite(&regs[i]->emp->cod, sizeof(int), 1, ret[0]);
 		fwrite(regs[i]->emp->nome, sizeof(char), sizeof(regs[i]->emp->nome), ret[0]);
 		fwrite(&regs[i]->emp->idade, sizeof(int), 1, ret[0]);
