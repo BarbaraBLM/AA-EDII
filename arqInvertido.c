@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "dependente.c"
-#include "empregado.c"
+//#include "dependente.c"
+//#include "empregado.h"
 
 typedef struct invertido{
     int ED;
@@ -195,7 +195,7 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
 
 	rewind(dados);//registros
 
-	printf("Registros lidos...\n");
+	//printf("Registros lidos...\n");
 	for (int i = 0; i < qtd_registros; ++i){ //lê todos os dados para a memoria principal
 		regs[i] = criaInvertido();
 		regs[i]->ED = i;
@@ -231,12 +231,12 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
 	char nome[50];
 	int idade, ed, qtd, n_dependentes;
 
-	printf("A5-NOME\n");
+	//printf("A5-NOME\n");
     while(fread(&nome, sizeof(char), sizeof(char)*50, ret[1]) != 0){
 
         fread(&ed, sizeof(int), 1, ret[1]);
         fread(&qtd, sizeof(int), 1, ret[1]);
-        printf("IDADE:%s ED:%d Q:%d\n", nome, ed, qtd);
+        printf("NOME:%s ED:%d Q:%d\n", nome, ed, qtd);
     }
     printf("\n\n");
     
@@ -307,7 +307,7 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
 
 	//PARA VERIFICAR RESULTADO
 	double salario;
-	printf("A5-SALARIO\n");
+	//printf("A5-SALARIO\n");
     while(fread(&salario, sizeof(double), 1, ret[3]) != 0){
 
         fread(&ed, sizeof(int), 1, ret[3]);
@@ -342,7 +342,7 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
 	rewind(ret[3]);//A5-salario
 
 	//PARA VERIFICAR RESULTADO
-	printf("A5-Ndependts\n");
+	//printf("A5-Ndependts\n");
     while(fread(&n_dependentes, sizeof(int), 1, ret[3]) != 0){
 
         fread(&ed, sizeof(int), 1, ret[3]);
@@ -370,25 +370,4 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
     for(int i=0; i<5; i++){
     	fclose(ret[i]);
     }
-}
-
-int main(){
-
-	int qtsRegistros;
-	FILE *regs;
-
-	if((regs = fopen("registros.dat","rb")) == NULL) //abre somente para leitura
-	{
-		printf("Erro ao abrir arquivo: registros.dat\n");
-		exit(1);
-	}
-
-	printf("Informe a quantidade de registros no arquivo de dados:");
-	scanf("%d",&qtsRegistros);
-
-	arquivo_invert(regs, qtsRegistros);
-
-	fclose(regs);
-
-	return 0;
 }
