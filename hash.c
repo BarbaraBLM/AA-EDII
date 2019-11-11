@@ -14,7 +14,8 @@ void initHash(FILE *h, int tam){
 }
 
 int hash(int n, int tam, int l){
-    return (n%(tam*(int)pow(2,l)));
+    if(tam == 0)    return 0;
+    return (n%(tam*((int)(pow(2,l)))));
 }
 
 void imprimeHash(FILE *hash){
@@ -29,6 +30,14 @@ void imprime_reg(FILE* r){
     rewind(r);
     Empregado* e = (Empregado*) malloc(tamanhoEmpregado());
     imprime_empreg(le_empreg(r));
+}
+
+int countExc(FILE* excl){
+    int aux = 0, cont=0;
+    while(fread(&aux, sizeof(int), 1, excl) > 0){
+        if(aux!=-1)    cont++;
+    }
+    return cont;
 }
 
 void percorrendo_lista(FILE* h, FILE* reg, int r_hash){
@@ -49,13 +58,15 @@ void percorrendo_lista(FILE* h, FILE* reg, int r_hash){
 }
 
 void inserirHash(FILE *h, FILE *r, FILE *exclusao, Empregado *emp, int tam, int l, int *qtd_registros){
-	int chave = hash(emp->cod, tam, l);
+    int chave = hash(emp->cod, tam, l);
+    //printf("Dps da hash\n\n");
 	int excl, aux, end_excl = -1;
 	rewind(exclusao);
 	while(fread(&excl, sizeof(int), 1, exclusao) != 0){ //Procurar caso tenha algum registro excluido
 		end_excl++;
 		if(excl != -1) break;
 	}
+    
 	fseek(h, chave*sizeof(int), SEEK_SET);
 	fread(&aux, sizeof(int), 1, h);
 	if(aux == -1){ //Caso a chave da hash esteja vazia
@@ -181,17 +192,30 @@ void expandHash(FILE *h, FILE *r, int tam, int* p, int l){
 }
 
 int buscarCod(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorna o endereço do arquivo de registros
-	int end_atual;
+    int end_atual = 0;
 	int chave = hash(cod, tam, l);
-	Empregado* emp;
-
+    
+	Empregado* emp = (Empregado*) malloc(tamanhoEmpregado());
 	fseek(h, chave*sizeof(int), SEEK_SET);
-	fread(&end_atual, sizeof(int), 1, h);
+	if(fread(&end_atual, sizeof(int), 1, h) <= 0){
+        printf("Erro ao ler a hash.\n");
+        return -1;
+    }
+    
 	fseek(regts, end_atual*tamanhoEmpregado(), SEEK_SET);
 	emp = le_empreg(regts);
-	if(emp->cod == cod && emp->status == 1)
-		return end_atual;
+    
+    if(emp == NULL){
+        printf("Arquivo de registros vazio\n");
+        return -1;
+    }
+    //printf("emp->cod = %d  emp->status = %d\n", emp->cod, emp->status);
+    if(emp->cod == cod && emp->status == 1){
+        //printf("if cod e status\n");
+        return end_atual;
+    }
 	else{
+        printf("else cod e status\n");
 		while(emp->prox != -1){
 			fseek(regts, emp->prox*tamanhoEmpregado(), SEEK_SET);
 			end_atual = emp->prox;
@@ -222,14 +246,13 @@ int buscarCod(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorna o
 	return -1;
 }
 
-void excluirHash(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int l){
+void excluirHash(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int l, int* qtd_registros){
     int aux,
     chave, 
     excl,
     end_ant;
     Empregado* emp;
     Empregado* prox;
-
     fseek(r, end*tamanhoEmpregado(), SEEK_SET);    // indo até registro em arq de reg
     emp = le_empreg(r);
 
@@ -377,68 +400,5 @@ void excluirHash(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int 
 	    	}
 	    }
     }
+    (*qtd_registros)--;
 }
-/*
-int excluirHash(FILE *h, FILE *r, FILE *exclusao, int emp, int tam, int* p, int l, int *qtd_registros){
-    int cod = 0, chave = 0, menos_um = -1;
-    Empregado* e = (Empregado*) malloc(tamanhoEmpregado());
-    Empregado* prox = (Empregado*) malloc(tamanhoEmpregado());
-
-    fseek(r, emp*tamanhoEmpregado(), SEEK_SET);    // indo até registro em arq de reg
-    if(fread(&cod, sizeof(int), 1, r) > 0){    //Conseguimos ler
-   
-        for(int i=0; i<=l; i++){    //rodando p/ cd l possível no momento em que o emp foi inserido
-            chave = hash(cod, tam, i);
-            //printf("Hash 1 = %d\n", chave);
-            if(chave < *p){
-                chave = hash(cod, tam+(*p), i);
-                //printf("Hash 2 = %d\n", chave);
-            }
-            e = le_empreg(r);
-            imprime_empreg(e);
-            if(e->cod == cod){    //reg = 1º reg
-                printf("   Primeiro   ...\n");   
-                fseek(h, chave*sizeof(int), SEEK_SET);
-                e->status = -1;
-                fwrite(&emp, sizeof(int), 1, exclusao);
-                if(e->prox != -1){    // tem proximo
-                    fwrite(&e->prox, sizeof(int), 1, h);                    
-                }
-                else{
-                    fwrite(&menos_um, sizeof(int), 1, h);
-                }
-                fseek(r, emp*tamanhoEmpregado(), SEEK_SET);
-                salva_empreg(e, r);    // p/ salvar empreg com status -1
-                free(e);    free(prox);
-                return 1;
-            }
-            else{
-                while(e->prox != -1){ //Vai até o final da lista encadeada
-                    fseek(r, e->prox*tamanhoEmpregado(), SEEK_SET);
-                    prox = le_empreg(r);    //lendo proximo
-                    if(prox->cod == cod){    //achamos reg
-                        e->prox = prox->prox;
-                        prox->status = -1;
-                        fwrite(&emp, sizeof(int), 1, exclusao);
-                        fseek(r, -tamanhoEmpregado(), SEEK_CUR);    //voltando um reg
-                        salva_empreg(prox, r);
-                        free(e);    free(prox);
-                        return 1;
-                    }
-                    else
-                        e = prox;
-                    // Não achamos nessa rodada do l
-                }
-            }
-        }
-        free(e);    free(prox);
-        return 0;
-    }
-    else{
-        printf("Não é possível ler arquivo de registros.\n");
-    }
-    free(e);
-    free(prox);
-    return 0;
-}
-*/
