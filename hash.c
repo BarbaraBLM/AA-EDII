@@ -57,16 +57,17 @@ void percorrendo_lista(FILE* h, FILE* reg, int r_hash){
     free(e);
 }
 
-void inserirHash(FILE *h, FILE *r, FILE *exclusao, Empregado *emp, int tam, int l, int *qtd_registros){
-    int chave = hash(emp->cod, tam, l);
-    //printf("Dps da hash\n\n");
+void inserirHash(FILE *h, FILE *r, FILE *exclusao, Empregado *emp, int tam, int p, int l, int *qtd_registros){
+	int chave = hash(emp->cod, tam, l);
 	int excl, aux, end_excl = -1;
 	rewind(exclusao);
+	if(chave < p){
+		chave = hash(emp->cod, tam, l+1);
+	}
 	while(fread(&excl, sizeof(int), 1, exclusao) != 0){ //Procurar caso tenha algum registro excluido
 		end_excl++;
 		if(excl != -1) break;
 	}
-    
 	fseek(h, chave*sizeof(int), SEEK_SET);
 	fread(&aux, sizeof(int), 1, h);
 	if(aux == -1){ //Caso a chave da hash esteja vazia
@@ -192,30 +193,19 @@ void expandHash(FILE *h, FILE *r, int tam, int* p, int l){
 }
 
 int buscarCod(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorna o endereço do arquivo de registros
-    int end_atual = 0;
+	int end_atual;
 	int chave = hash(cod, tam, l);
-    
-	Empregado* emp = (Empregado*) malloc(tamanhoEmpregado());
+	Empregado* emp;
+	if(chave < p){
+		chave = hash(emp->cod, tam, l+1);
+	}
 	fseek(h, chave*sizeof(int), SEEK_SET);
-	if(fread(&end_atual, sizeof(int), 1, h) <= 0){
-        printf("Erro ao ler a hash.\n");
-        return -1;
-    }
-    
+	fread(&end_atual, sizeof(int), 1, h);
 	fseek(regts, end_atual*tamanhoEmpregado(), SEEK_SET);
 	emp = le_empreg(regts);
-    
-    if(emp == NULL){
-        printf("Arquivo de registros vazio\n");
-        return -1;
-    }
-    //printf("emp->cod = %d  emp->status = %d\n", emp->cod, emp->status);
-    if(emp->cod == cod && emp->status == 1){
-        //printf("if cod e status\n");
-        return end_atual;
-    }
+	if(emp->cod == cod && emp->status == 1)
+		return end_atual;
 	else{
-        printf("else cod e status\n");
 		while(emp->prox != -1){
 			fseek(regts, emp->prox*tamanhoEmpregado(), SEEK_SET);
 			end_atual = emp->prox;
@@ -224,40 +214,25 @@ int buscarCod(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorna o
 				return end_atual;
 		}
 	}
-	if(chave < p){
-		chave = hash(cod, tam, l+1);
-		fseek(h, chave*sizeof(int), SEEK_SET);
-		fread(&end_atual, sizeof(int), 1, h);
-		fseek(regts, end_atual*tamanhoEmpregado(), SEEK_SET);
-		emp = le_empreg(regts);
-		if(emp->cod == cod && emp->status == 1)
-			return end_atual;
-		else{
-			while(emp->prox != -1){
-				fseek(regts, emp->prox*tamanhoEmpregado(), SEEK_SET);
-				end_atual = emp->prox;
-				emp = le_empreg(regts);
-				if(emp->cod == cod && emp->status == 1)
-					return end_atual;
-			}
-		}
-	}
 
 	return -1;
 }
 
-void excluirHash(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int l, int* qtd_registros){
+void excluirHash(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int l){
     int aux,
     chave, 
     excl,
     end_ant;
     Empregado* emp;
     Empregado* prox;
+
     fseek(r, end*tamanhoEmpregado(), SEEK_SET);    // indo até registro em arq de reg
     emp = le_empreg(r);
 
     chave = hash(emp->cod, tam, l);
-
+    if(chave < p){
+		chave = hash(emp->cod, tam, l+1);
+	}
     fseek(h, chave*sizeof(int), SEEK_SET);
     fread(&aux, sizeof(int), 1, h);
 
@@ -327,78 +302,4 @@ void excluirHash(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int 
 	    	}
     	}
     }
-    if(chave < p){ //Caso a hash já tenha extendido e o registro se encontra na extensão oq muda é a chave calculada com l+1
-    	chave = hash(emp->cod, tam, l+1);
-
-	    fseek(h, chave*sizeof(int), SEEK_SET);
-	    fread(&aux, sizeof(int), 1, h);
-
-	    if(aux == end){
-	    	rewind(exclusao);
-	    	for (int i = 0; fread(&aux, sizeof(int), 1, exclusao) != 0; ++i){
-	    		if(aux == -1){
-	    			excl = i;
-	    			break;
-	    		}
-	    	}
-	    	if(aux == -1){
-	    		fseek(exclusao, excl*sizeof(int), SEEK_SET);
-	    		fwrite(&end, sizeof(int), 1, exclusao);
-	    		fseek(h, chave*sizeof(int), SEEK_SET);
-	    		fwrite(&emp->prox, sizeof(int), 1, h);
-	    		emp->status = -1;
-	    		fseek(r, end*tamanhoEmpregado(), SEEK_SET);
-	    		salva_empreg(emp, r);
-	    	}
-	    	else{
-	    		fseek(exclusao, 0, SEEK_END);
-	    		fwrite(&end, sizeof(int), 1, exclusao);
-	    		fseek(h, chave*sizeof(int), SEEK_SET);
-	    		fwrite(&emp->prox, sizeof(int), 1, h);
-	    		emp->status = -1;
-	    		fseek(r, end*tamanhoEmpregado(), SEEK_SET);
-	    		salva_empreg(emp, r);
-	    	}
-	    }
-	    else{
-	    	fseek(r, aux*tamanhoEmpregado(), SEEK_SET);
-	    	prox = le_empreg(r);
-	    	end_ant = aux;
-	    	while(prox->prox != -1 && prox->prox != end){
-				fseek(r, emp->prox*tamanhoEmpregado(), SEEK_SET);
-				end_ant = emp->prox;
-				prox = le_empreg(r);
-			}
-			if(prox->prox != -1){
-				rewind(exclusao);
-		    	for (int i = 0; fread(&aux, sizeof(int), 1, exclusao) != 0; ++i){
-		    		if(aux == -1){
-		    			excl = i;
-		    			break;
-		    		}
-		    	}
-		    	if(aux == -1){
-		    		fseek(exclusao, excl*sizeof(int), SEEK_SET);
-		    		fwrite(&end, sizeof(int), 1, exclusao);
-		    		fseek(r, end_ant*tamanhoEmpregado(), SEEK_SET);
-		    		prox->prox = emp->prox;
-		    		salva_empreg(prox, r);
-		    		emp->status = -1;
-		    		fseek(r, end*tamanhoEmpregado(), SEEK_SET);
-		    		salva_empreg(emp, r);
-		    	}
-		    	else{
-		    		fseek(exclusao, 0, SEEK_END);
-		    		fwrite(&end, sizeof(int), 1, exclusao);
-		    		fseek(r, end_ant*tamanhoEmpregado(), SEEK_SET);
-		    		prox->prox = emp->prox;
-		    		salva_empreg(prox, r);
-		    		emp->status = -1;
-		    		fseek(r, end*tamanhoEmpregado(), SEEK_SET);
-		    		salva_empreg(emp, r);
-		    	}
-	    	}
-	    }
-    }
-    (*qtd_registros)--;
 }
