@@ -302,4 +302,5 @@ void excluirHash(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int 
 	    	}
     	}
     }
+    *qtd_registros -=1;
 }
