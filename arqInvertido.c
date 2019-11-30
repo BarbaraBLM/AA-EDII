@@ -333,6 +333,8 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
 				regs[i]->QTD = 1;
 			}
 		}
+
+		return
 	}
 
 	qsort_cp(regs, qtd_registros);
@@ -350,7 +352,5 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
 		fwrite(&regs[i]->prox_n_dependentes, sizeof(int), 1, ret[0]);//ponteiro p/ prox n_dependentes
 	}
 
-    for(int i=0; i<5; i++){
-    	fclose(ret[i]);
-    }
+    return ret;
 }
