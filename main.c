@@ -4,7 +4,7 @@
 #include "empregado.h"
 #include "dependente.h"
 #include "hash.h"
-#include "arqInvertido.c"
+#include "invertidoemp.c"
 
 int main(int argc, char *argv[]){
     int tamHash = atoi(argv[1]);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]){
 				scanf(" %lf", &salario);
 				fflush(stdin);
 				Empregado *emp = criarEmpregado(nome, idade, salario);
-				inserirHash(hash, regts, excls, emp, tamHash, l, &qtd_registros);
+				inserirHash(hash, regts, excls, emp, tamHash, p, l, &qtd_registros);
                 printf("Empregado inserido!\n\n");
 				break;
 			case 2 :    //Cadastrar dependente
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
 				printf("\nIdade do Dependente: ");
 				scanf(" %d", &idade);
 				fflush(stdin);
-                arqsInv = arquivo_invert(regts, qtd_registros);
+                arqsInv = arquivo_invertido_emp(regts, qtd_registros);
                 /*cod = buscarNome();
 				Dependente *dep = criarDependente(nome2, idade, cod);
 				inserirHash(hash, regts, excls, emp, tamHash, l, &qtd_registros);    //Inserindo dependente na hash...
