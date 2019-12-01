@@ -218,7 +218,7 @@ int buscarCod(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorna o
 	return -1;
 }
 
-void excluirHash(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int l){
+void excluirHash(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int l, int *qtd_registros){
     int aux,
     chave, 
     excl,
