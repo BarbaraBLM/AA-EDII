@@ -4,7 +4,7 @@
 #include <string.h>
 #include "empregado.h"
 #include "dependente.h"
-#include "invertidodep.h"
+#include "invertidoemp.h"
 
 typedef struct invertido{
     int ED;
