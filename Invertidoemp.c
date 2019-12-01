@@ -4,6 +4,7 @@
 #include <string.h>
 #include "empregado.h"
 #include "dependente.h"
+#include "invertidodep.h"
 
 typedef struct invertido{
     int ED;
@@ -190,7 +191,6 @@ FILE** arquivo_invertido_emp(FILE* dados, int qtd_registros){
 
 	rewind(dados);//registros
 
-	printf("Registros lidos...\n");
 	for (int i = 0; i < qtd_registros; ++i){ //lê todos os dados para a memoria principal
 		regs[i] = criaInvertido();
 		regs[i]->ED = i;
