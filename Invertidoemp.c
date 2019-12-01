@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "dependente.c"
-#include "empregado.c"
+#include "empregado.h"
+#include "dependente.h"
 
 typedef struct invertido{
     int ED;
@@ -170,14 +170,13 @@ void qsort_cp(Invertido *regs[], int qtd_registros){
 	}
 }
 
-FILE** arquivo_invert(FILE* dados, int qtd_registros){
+FILE** arquivo_invertido_emp(FILE* dados, int qtd_registros){
 
 	FILE** ret = malloc(5*sizeof(FILE*));
 
 	for(int i=0; i< 5; i++){
 		ret[i] =  malloc(sizeof(FILE*));
 	}
-
 
 	ret[0] = fopen("A8.dat","w+b");
 	ret[1] = fopen("A5-Nome.dat","w+b");
