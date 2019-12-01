@@ -172,7 +172,13 @@ void qsort_cp(Invertido *regs[], int qtd_registros){
 
 FILE** arquivo_invert(FILE* dados, int qtd_registros){
 
-	FILE *ret[5];
+	FILE** ret = malloc(5*sizeof(FILE*));
+
+	for(int i=0; i< 5; i++){
+		ret[i] =  malloc(sizeof(FILE*));
+	}
+
+
 	ret[0] = fopen("A8.dat","w+b");
 	ret[1] = fopen("A5-Nome.dat","w+b");
 	ret[2] = fopen("A5-Idade.dat","w+b");
@@ -333,8 +339,6 @@ FILE** arquivo_invert(FILE* dados, int qtd_registros){
 				regs[i]->QTD = 1;
 			}
 		}
-
-		return
 	}
 
 	qsort_cp(regs, qtd_registros);
