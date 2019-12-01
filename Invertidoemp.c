@@ -6,19 +6,6 @@
 #include "dependente.h"
 #include "invertidoemp.h"
 
-typedef struct invertido{
-    int ED;
-    //A8
-    Empregado *emp;
-    int prox_nome;
-    int prox_idade;
-    int prox_salario;
-    int prox_n_dependentes;
-    //A5
-    int PT;
-    int QTD;
-}Invertido;
-
 Invertido* criaInvertido(){
 	Invertido *novo = (Invertido *)malloc(sizeof(Invertido));
 	novo->prox_nome = -1;
