@@ -165,8 +165,8 @@ void qsort_cp(Invertido *regs[], int qtd_registros){
 		regs[0] = regs[b];
 		regs[b] = x;
 
-		qsort_ndependentes(regs,b);
-		qsort_ndependentes(&regs[a], qtd_registros-a);
+		qsort_cp(regs,b);
+		qsort_cp(&regs[a], qtd_registros-a);
 	}
 }
 
