@@ -1,9 +1,10 @@
+//    ATENÇÃO : argumento de linha de comando = tamanho da Hash. Rode: .\exe tam
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "empregado.h"
-#include "dependente.h"
-#include "hash.h"
+#include "empregado.c"
+#include "dependente.c"
+#include "hash.c"
 #include "invertidoemp.c"
 
 int main(int argc, char *argv[]){
@@ -15,7 +16,9 @@ int main(int argc, char *argv[]){
     int run = 1;
     int op, busca = 0;
     Empregado* emp_aux;
-
+    Empregado** emps;
+    Dependente* d;
+    
     int cod;
 	char nome[50], nome2[50];
 	int idade = 0;
@@ -40,59 +43,75 @@ int main(int argc, char *argv[]){
 		switch (op){
 			case 1 :    //Cadastrar empregado
 				printf("Digite o nome do Empregado: ");
-				scanf("%s[^\n]", nome);        //[^\n] -> n funciona
-				fflush(stdin);
-				printf("\nIdade do Empregado: ");
-				scanf(" %d", &idade);
-				fflush(stdin);
-				printf("\nSalario do Empregado: ");
-				scanf(" %lf", &salario);
-				fflush(stdin);
-				Empregado *emp = criarEmpregado(nome, idade, salario);
-				inserirHash(hash, regts, excls, emp, tamHash, p, l, &qtd_registros);
-                printf("Empregado inserido!\n\n");
+                scanf("%s[^\n]", nome);                
+                fflush(stdin);
+                printf("Idade do Empregado: ");
+                scanf(" %d", &idade);
+                fflush(stdin);
+                printf("Salario do Empregado: ");
+                scanf(" %lf", &salario);
+                fflush(stdin);
+                Empregado *emp = criarEmpregado(nome, idade, salario);
+                inserirHashEmp(hash, regts, excls, emp, tamHash, p, l, &qtd_registros);
+                printf("Empregado inserido!\n\n");       
 				break;
 			case 2 :    //Cadastrar dependente
-                /*printf("Digite o nome do Empregado do qual é dependente: ");
-                buscarNome();
+                printf("Digite o nome do Dependente: ");
 				scanf("%s[^\n]", nome);
 				fflush(stdin);
-                printf("Digite o nome do Dependente: ");
-				scanf("%s[^\n]", nome2);
-				fflush(stdin);
-				printf("\nIdade do Dependente: ");
+				printf("Idade do Dependente: ");
 				scanf(" %d", &idade);
 				fflush(stdin);
+                printf("Digite o nome do Empregado do qual é dependente: ");
+                scanf("%s[^\n]", nome2);
+				fflush(stdin);
                 arqsInv = arquivo_invertido_emp(regts, qtd_registros);
-                /*cod = buscarNome();
-				Dependente *dep = criarDependente(nome2, idade, cod);
-				inserirHash(hash, regts, excls, emp, tamHash, l, &qtd_registros);    //Inserindo dependente na hash...
-                printf("Dependente inserido!\n\n");*/
-				printf("Não implementado ainda!\n\n");
+                emps = buscaNome(arqsInv, nome2);
+                if(emps != NULL){
+                    int resul = sizeof(emps)/sizeof(FILE*);
+                    printf("Resul :        %d    ----    -----\n\n", resul);
+                    if(resul > 1){    //Precisa escolher um empregado
+                        printf("Mais de um empregado com esse nome. Por favor, digite o código do empregado desejado:\n");
+                        for(int i=0;i<resul;i++)
+                            imprime_empreg(emps[i]);
+                        scanf("%d", &cod);
+                         for(int i=0;i<resul;i++){
+                             if(cod == emps[i]->cod){
+                                 d = criarDependente(nome, idade, emps[i]->cod);
+                                inserirHashDep(hash, regts, excls, d, tamHash, p, l, &qtd_registros);
+                             }
+                         }
+                    }
+                    else{
+                        d = criarDependente(nome, idade, emps[0]->cod);
+                        printf("Antes d inserir Hash    -----    -----\n\n");
+                    }
+                }
+                else    printf("Não foi possível encontrar empregado correspondente.\n");
 				break;
 			case 3 :    //Buscar
 				printf("1. Buscar Empregado\n2. Buscar Dependente\n3. Voltar\nDigite uma opção: ");
 				scanf("%d", &op);
 				fflush(stdin);
 				switch (op){
-					case 1 :
+					case 1 :    //buscar Empregado
 						printf("1. Buscar Codigo\n2. Buscar Nome\n3. Buscar Idade\n4. Buscar Salario\n5. Buscar Número de Dependente\n6. Voltar\nDigite uma opção: ");
 						scanf("%d", &op);
 						fflush(stdin);
 						switch (op){
-							case 1 :
+							case 1 :    //por codigo
 								printf("Digite o codigo do Empregado: ");
 								scanf("%d", &cod);
 								fflush(stdin);
-								if((end = buscarCod(hash, regts, cod, tamHash, p, l)) != -1){
+								if((end = buscarCodEmp(hash, regts, cod, tamHash, p, l)) != -1){
 									printf("Empregado encontrado!\n\n1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
 									scanf("%d", &op);
 									fflush(stdin);
 									switch (op){
 										case 1 :
                                             printf("Não implementado ainda\n");
-											/*excluirHash(hash, regts, excls, end, tamHash, p, l);
-											printf("Empregado Excluido!\n");    SEG FAULT*/
+											excluirHashEmp(hash, regts, excls, end, tamHash, p, l, &qtd_registros);
+											printf("Empregado Excluido!\n");    //SEG FAULT*/
 											break;
 										case 2 :
 											printf("Não implementado ainda!\n\n");
@@ -113,10 +132,42 @@ int main(int argc, char *argv[]){
 								else
 									printf("Empregado NÃO encontrado!\n\n");
 								break;
-							case 2 :
-								printf("Não implementado ainda!\n\n");
+							case 2 :    //por nome
+                                printf("Digite o nome do empregado: ");
+                                scanf("%s[^\n]", nome);
+                                printf("Dps do scanf                                                -------\n");
+                                emps = buscaNome(arqsInv, nome);
+                                printf("Dps de arqsInv    ---    -    -    -\n\n");
+                                if(emps != NULL){
+                                    printf("NO IF                    ----------------\n");
+                                    int resul = sizeof(emps)/sizeof(FILE*);
+                                    printf("reusl = %d            -----                    --", resul);
+                                    if(resul == 1){
+                                        printf("Empregado encontrado!\n\n1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
+                                        scanf("%d", &op);
+                                        fflush(stdin);
+                                        switch (op){
+                                            case 1 :
+                                                printf("Não implementado ainda\n");
+                                                /*excluirHash(hash, regts, excls, end, tamHash, p, l);
+                                                printf("Empregado Excluido!\n");    SEG FAULT*/
+                                                break;
+                                            case 2 :
+                                                printf("Não implementado ainda!\n\n");
+                                                break;
+                                            case 3 :
+                                                imprime_empreg(emps[0]);
+                                                printf("\n");
+                                                break;
+                                            case 4 :
+                                                break;
+                                            default :
+                                                printf("Opção invalida!\n");
+                                        }
+                                    }
+                                }
 								break;
-							case 3 :
+							case 3 :    //por idade
 								printf("Não implementado ainda!\n\n");
 								break;
 							case 4 :
@@ -154,7 +205,7 @@ int main(int argc, char *argv[]){
 								printf("Digite o codigo do Empregado: ");
 								scanf("%d", &cod);
 								fflush(stdin);
-								if((end = buscarCod(hash, regts, cod, tamHash, p, l)) != -1){
+								if((end = buscarCodEmp(hash, regts, cod, tamHash, p, l)) != -1){
 									fseek(regts, end*tamanhoEmpregado(), SEEK_SET);
                                     emp_aux = le_empreg(regts);
                                     imprime_empreg(emp_aux);
