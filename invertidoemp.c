@@ -345,6 +345,35 @@ FILE** arquivo_invertido_emp(FILE* dados, int qtd_registros){
     return ret;
 }
 
+void imprimeA8(FILE** arqsInv, int qtd_registros){
+
+	int cod;
+	char nome[50], nome2[50];
+	int idade = 0;
+	double salario;
+	int n_dependentes, prox_nome, prox_idade, prox_salario, prox_n_dependentes;
+	int end;
+	int ed;
+	int qtd;
+
+	rewind(arqsInv[0]);//A8
+    
+	for (int i = 0; i < 5; ++i){ 
+
+		fread(&cod, sizeof(int), 1, arqsInv[0]);
+		fread(nome, sizeof(char), sizeof(char)*50, arqsInv[0]);
+		fread(&idade, sizeof(int), 1, arqsInv[0]);
+		fread(&salario, sizeof(double), 1, arqsInv[0]);
+		fread(&n_dependentes, sizeof(int), 1, arqsInv[0]);
+		fread(&prox_nome, sizeof(int), 1, arqsInv[0]);//ponteiro p/ prox nome
+		fread(&prox_idade, sizeof(int), 1, arqsInv[0]);//ponteiro p/ prox idad		
+		fread(&prox_salario, sizeof(int), 1, arqsInv[0]);//ponteiro p/ prox salario
+		fread(&prox_n_dependentes, sizeof(int), 1, arqsInv[0]);//ponteiro p/ prox n_dependentes
+		printf("cod %d nome %s idade %d sal %lf ndep %d pnome %d pidade %d psal %d pndep %d\n", cod, nome, idade, salario, n_dependentes, prox_nome, prox_idade, prox_salario, prox_n_dependentes);
+	}
+
+}
+
 Empregado** buscaNome(FILE** arqsInv, char* nome){
     printf("Em buscaNome. nome = %s\n", nome);
     //arqsInv[1] --> A5-Nome.dat    nome, ED, QTD
