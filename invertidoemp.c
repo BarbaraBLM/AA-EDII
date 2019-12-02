@@ -378,3 +378,74 @@ Empregado** buscaNome(FILE** arqsInv, char* nome){
     }
     return NULL;
 }
+
+
+Empregado** buscaIdadeMaiorQueX(FILE** arqsInv, int x){
+
+	//arqsInv[2] --> A5-Idade.dat:   idade, ED, QTD
+
+    int ed=0, qtd=0, prox_idade=0, qtdTotal=0, pos=0;
+    int idade=0;
+
+    rewind(arqsInv[0]);//A8
+    rewind(arqsInv[2]);//A5-IDADE
+
+    while(fread(idade, sizeof(int), 1, arqsInv[2]) > 0){
+
+    	fread(ed, sizeof(int), 1, arqsInv[1]);
+    	fread(qtd, sizeof(int), 1, arqsInv[1]);
+
+    	if(idade>x){
+    		//quatidade total de resultados
+    		qtdTotal += qtd;
+    	}
+    }
+
+    Empregado** empregados = (Empregado**) malloc(qtdTotal*sizeof(Empregado*));
+
+
+    rewind(arqsInv[2]);//A5-IDADE
+
+    while(fread(idade, sizeof(int), 1, arqsInv[2]) > 0){
+
+    	fread(ed, sizeof(int), 1, arqsInv[2]);
+    	fread(qtd, sizeof(int), 1, arqsInv[2]);
+
+    	if(idade>x){
+
+	    	//pro fseek: Empregado() + 2*sizeof(int)) corresponde a uma linha no A8
+	    	fseek(arqsInv[0], (ed-1)*(tamanhoEmpregado() + 2*sizeof(int)) , SEEK_SET);
+
+	    	//lendo todos os registros que atendem ao critério da busca
+	    	for(int i=0; i<qtd; i++){
+
+	    		fread(&empregados[pos]->cod, sizeof(int), 1, arqsInv[0]);
+	            fread(empregados[pos]->nome, sizeof(char), 50, arqsInv[0]);
+	            fread(&empregados[pos]->idade, sizeof(int), 1, arqsInv[0]);
+	            fread(&empregados[pos]->salario, sizeof(float), 1, arqsInv[0]);
+	            fread(&empregados[pos]->n_dependentes, sizeof(int), 1, arqsInv[0]);
+
+	            //pula o prox_nome
+	            fseek(arqsInv[0], sizeof(int), SEEK_CUR);
+
+	            //lê prox_idade
+	            fread(&prox_idade, sizeof(int), 1, arqsInv[0]);
+
+				//pula o prox_salario, prox_dependentes
+	            fseek(arqsInv[0], 2*sizeof(int), SEEK_CUR);
+
+	            fseek(arqsInv[0], (prox_idade-1)*(tamanhoEmpregado() + 2*sizeof(int)), SEEK_SET);    //Indo para a prox idade
+
+	            //posição do vetor de empregados que será retornado
+	            ++pos;
+	    	}
+    	}
+    }
+
+    if(qtdTotal!=0){
+
+    	return empregados;
+    }
+
+    return NULL;
+}
