@@ -29,5 +29,6 @@ void qsort_ndependentes(Invertido *regs[], int qtd_registros);
 void qsort_cp(Invertido *regs[], int qtd_registros);
 FILE** arquivo_invertido_emp(FILE* dados, int qtd_registros);
 Empregado** buscaNome(FILE** arqsInv, char* nome);
+Empregado** buscaIdadeMaiorQueX(FILE** arqsInv, int x);
 
 #endif
