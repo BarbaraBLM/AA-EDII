@@ -68,13 +68,18 @@ int main(int argc, char *argv[]){
                 arqsInv = arquivo_invertido_emp(regts, qtd_registros);
                 emps = buscaNome(arqsInv, nome2);
                 if(emps != NULL){
-                    int resul = sizeof(emps)/sizeof(FILE*);
-                    printf("Resul :        %d    ----    -----\n\n", resul);
+                    // -----    -----    -----    SEG FAULT EM emps[i]    !!
+                    int resul = sizeof(emps)/sizeof(Empregado*);
+                    printf("Resul :        %d registros   ----    -----\n\nImprimindo:\n", resul);
+                    //Imprimindo aki só p/ teste
+                    for(int i=0;i<resul;i++)
+                            imprime_empreg(emps[i]);    //n imprime
+                    
                     if(resul > 1){    //Precisa escolher um empregado
                         printf("Mais de um empregado com esse nome. Por favor, digite o código do empregado desejado:\n");
                         for(int i=0;i<resul;i++)
                             imprime_empreg(emps[i]);
-                        scanf("%d", &cod);
+                        scanf(" %d", &cod);
                          for(int i=0;i<resul;i++){
                              if(cod == emps[i]->cod){
                                  d = criarDependente(nome, idade, emps[i]->cod);
@@ -83,11 +88,13 @@ int main(int argc, char *argv[]){
                          }
                     }
                     else{
-                        d = criarDependente(nome, idade, emps[0]->cod);
-                        printf("Antes d inserir Hash    -----    -----\n\n");
+                        printf("No else    ---    -----    ------\n");
+                        d = criarDependente(nome, idade, emps[0]->cod);    //-->    A SEG FAULT ESTÁ AQUI    (acho q é emps[0]) 
+                        printf("TESTE    TESTE\n");
+                        inserirHashDep(hash, regts, excls, d, tamHash, p, l, &qtd_registros);
                     }
                 }
-                else    printf("Não foi possível encontrar empregado correspondente.\n");
+                else    printf("Não foi possível encontrar empregado correspondente.\n\n");
 				break;
 			case 3 :    //Buscar
 				printf("1. Buscar Empregado\n2. Buscar Dependente\n3. Voltar\nDigite uma opção: ");
