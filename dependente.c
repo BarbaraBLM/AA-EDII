@@ -17,7 +17,7 @@ Dependente* criarDependente(char* n, int idade, int cod_emp){
     return e;
 }
 
-void salva_depend(Dependente *e, FILE *out){
+void salva_dep(Dependente *e, FILE *out){
 	if(out != NULL){
         fwrite(&e->cod, sizeof(int), 1, out);
         fwrite(e->nome, sizeof(char), sizeof(e->nome), out);
@@ -31,7 +31,7 @@ void salva_depend(Dependente *e, FILE *out){
     free(e);
 }
 
-Dependente* le_depend(FILE *in){
+Dependente* le_dep(FILE *in){
 	Dependente *e = (Dependente*) malloc(sizeof(Dependente));
     if (0 >= fread(&e->cod, sizeof(int), 1, in))
     {
@@ -46,7 +46,7 @@ Dependente* le_depend(FILE *in){
     return e;
 }
 
-void imprime_depend(Dependente *e){
+void imprime_dep(Dependente *e){
     printf("\n\nDependente:\nCod: %d\nNome: %s\nIdade:%d\nCod Empregado:%d\nStatus:%d\n", (e->cod), e->nome, e->idade, e->cod_emp, e->status);
 }
 
