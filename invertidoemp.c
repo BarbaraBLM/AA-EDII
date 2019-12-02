@@ -340,6 +340,7 @@ FILE** arquivo_invertido_emp(FILE* dados, int qtd_registros){
 		fwrite(&regs[i]->prox_idade, sizeof(int), 1, ret[0]);//ponteiro p/ prox idad		
 		fwrite(&regs[i]->prox_salario, sizeof(int), 1, ret[0]);//ponteiro p/ prox salario
 		fwrite(&regs[i]->prox_n_dependentes, sizeof(int), 1, ret[0]);//ponteiro p/ prox n_dependentes
+		fwrite(&regs[i]->status, sizeof(int), 1, ret[0]);//status
 	}
 
     return ret;
