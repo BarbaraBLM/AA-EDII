@@ -206,7 +206,8 @@ FILE** arquivo_invertido_dep(FILE* dados, int qtd_registros){
 		fwrite(regs[i]->dep->nome, sizeof(char), sizeof(regs[i]->dep->nome), ret[0]);
 		fwrite(&regs[i]->dep->idade, sizeof(int), 1, ret[0]);
 		fwrite(&regs[i]->prox_nome, sizeof(int), 1, ret[0]);//ponteiro p/ prox nome
-		fwrite(&regs[i]->prox_idade, sizeof(int), 1, ret[0]);//ponteiro p/ prox idad		
+		fwrite(&regs[i]->prox_idade, sizeof(int), 1, ret[0]);//ponteiro p/ prox idad	
+		fwrite(&regs[i]->status, sizeof(int), 1, ret[0]);
 	}
 
     return ret;
