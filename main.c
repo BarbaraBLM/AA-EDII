@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
     int p = 0;
     int aux = -1;
     int run = 1;
-    int op, busca = 0;
+    int op, busca = 0, resul = 0, i = 0;
     Empregado* emp_aux;
     Empregado** emps;
     Dependente* d;
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]){
                 emps = buscaNome(arqsInv, nome2);
                 if(emps != NULL){
                     // -----    -----    -----    SEG FAULT EM emps[i]    !!
-                    int resul = sizeof(emps)/sizeof(Empregado*);
+                    resul = sizeof(emps)/sizeof(Empregado*);
                     printf("Resul :        %d registros   ----    -----\n\nImprimindo:\n", resul);
                     //Imprimindo aki só p/ teste
                     for(int i=0;i<resul;i++)
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]){
                                 printf("Dps de arqsInv    ---    -    -    -\n\n");
                                 if(emps != NULL){
                                     printf("NO IF                    ----------------\n");
-                                    int resul = sizeof(emps)/sizeof(FILE*);
+                                    resul = sizeof(emps)/sizeof(FILE*);
                                     printf("reusl = %d            -----                    --", resul);
                                     if(resul == 1){
                                         printf("Empregado encontrado!\n\n1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
@@ -175,6 +175,65 @@ int main(int argc, char *argv[]){
                                 }
 								break;
 							case 3 :    //por idade
+                                printf("Buscar empregados com idade maior que: ");
+                                scanf(" %d", &idade);
+                                while(idade < 0){
+                                    printf("Idade negativa. Tente novamente.\n");
+                                    scanf(" %d", &idade);
+                                }
+                                emps = buscaIdadeMaiorQueX(arqsInv, idade);
+                                if(emps != NULL){
+                                    resul = sizeof(emps)/sizeof(Empregado*);
+                                    for(int i=0;i<resul;i++){
+                                        printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes);
+                                    }
+                                    if(resul > 1){
+                                        printf("Empregados encontrados!\nDeseja alterar algum desses registros?\n1. Sim\n2. Não\n");
+                                        printf("Empregado encontrado!\n\n1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
+                                        scanf(" %d", &op);
+                                        switch (op){
+                                            case 1:
+                                                printf("Digite o código do registro: ");
+                                                scanf(" %d", &cod);
+                                                do{
+                                                    for(int i=0;i<resul;i++){
+                                                    if(cod == emps[i]->cod)
+                                                        break;
+                                                    }
+                                                    if(i==resul-1)    printf("Código não encontrado.\n");
+                                                }while(i == resul-1);
+                                                printf("1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
+                                                scanf(" %d", &op);
+                                                switch(op){
+                                                    case 1:    //excluir
+                                                        rewind(arqsInv[0]);
+                                                        int i=0, aux = 0;
+                                                        while(fread(&aux, sizeof(int), 1, arqsInv[0]) > 0){
+                                                            i++;
+                                                            if(aux = cod){
+                                                                break;
+                                                            }
+                                                            fseek(arqsInv[0], 50*sizeof(char), SEEK_CUR);//pula nome
+                                                            fseek(arqsInv[0], sizeof(int), SEEK_CUR);//pula idade
+                                                            fseek(arqsInv[0], sizeof(double), SEEK_CUR);//pula salario
+                                                            fseek(arqsInv[0], 5*sizeof(int), SEEK_CUR);//pula n_dependentes, prox_
+                                                        }
+                                                         excluirHashEmp(hash, regts, excls, i, tamHash, p, l, &qtd_registros);
+                                                        break;
+                                                    case 2:
+                                                        break;
+                                                    case 3:
+                                                        break;
+                                                    case 4:
+                                                        break;
+                                                    default:
+                                                        printf("Opção invalida!\n");
+                                                }
+                                                
+                                        }
+                                        
+                                    }
+                                }
 								printf("Não implementado ainda!\n\n");
 								break;
 							case 4 :
