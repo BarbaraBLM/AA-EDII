@@ -14,9 +14,9 @@ typedef struct dependente{
 }Dependente;
 
 Dependente* criarDependente(char* n, int idade, int cod_emp);
-void salva_depend(Dependente *e, FILE *out);
-Dependente* le_depend(FILE *in);
-void imprime_depend(Dependente *e);
+void salva_dep(Dependente *e, FILE *out);
+Dependente* le_dep(FILE *in);
+void imprime_dep(Dependente *e);
 int tamanhoDependente();
 
 #endif
