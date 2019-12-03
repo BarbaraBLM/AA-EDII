@@ -426,7 +426,7 @@ Empregado** buscaNome(FILE** arqsInv, char* nome, int *qtdTotal){
     }
     printf("FIM BUSCA NOME\n");
 
-    if(qtdTotal!=0){
+    if(*qtdTotal!=0){
     	return empregados;
     }
     return NULL;
@@ -490,7 +490,7 @@ printf("BUSCA IDADE\n");
     }
     printf("FIM BUSCA IDADE\n");
 
-    if(qtdTotal!=0){
+    if(*qtdTotal!=0){
 
     	return empregados;
     }
@@ -560,7 +560,7 @@ Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
 
     printf("FIM BUSCA N_DEPENDENTES\n");
 
-    if(qtdTotal!=0){
+    if(*qtdTotal!=0){
 
     	return empregados;
     }
@@ -630,7 +630,7 @@ Empregado** buscaSalarioMaiorQueX(FILE** arqsInv, double x, int *qtdTotal){
 
     printf("FIM BUSCA SALARIO\n");
 
-    if(qtdTotal!=0){
+    if(*qtdTotal!=0){
 
     	return empregados;
     }
