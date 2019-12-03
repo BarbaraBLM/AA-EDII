@@ -567,3 +567,73 @@ Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
 
     return NULL;
 }
+
+//busca empregados que têm salario maior que X de dependentes
+Empregado** buscaSalarioMaiorQueX(FILE** arqsInv, double x, int *qtdTotal){
+
+	//arqsInv[3] --> A5-Salario.dat:   SALARIO, PT, QTD
+	printf("BUSCA SALARIO\n");
+
+    int pt=0, qtd=0, prox_salario=0, /*qtdTotal=0, */pos=0;
+    double salario=0;
+    rewind(arqsInv[0]);//A8
+    rewind(arqsInv[3]);//A5-SALARIO
+
+    while(fread(&salario, sizeof(double), 1, arqsInv[3]) > 0){
+
+    	fread(&pt, sizeof(int), 1, arqsInv[3]);
+    	fread(&qtd, sizeof(int), 1, arqsInv[3]);
+
+    	if(salario>x){
+    		//quatidade total de resultados para o tamanho do vetor de resultados
+    		*qtdTotal += qtd;
+    	}
+    }
+
+    Empregado** empregados = malloc((*qtdTotal)*sizeof(Empregado*));
+	for(int i=0; i< 5; i++){
+		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
+	}
+
+    rewind(arqsInv[3]);//A5-SALARIO
+
+    while(fread(&salario, sizeof(double), 1, arqsInv[3]) > 0){
+
+    	fread(&pt, sizeof(int), 1, arqsInv[3]);
+    	fread(&qtd, sizeof(int), 1, arqsInv[3]);
+
+    	if(salario>x){
+
+    		fseek(arqsInv[0], (pt)*(tamanhoEmpregado() + sizeof(int)) , SEEK_SET);
+
+	    	//lendo todos os registros que atendem ao critério da busca
+	    	for(int i=0; i<qtd; i++){
+	    		fread(&empregados[pos]->cod, sizeof(int), 1, arqsInv[0]);
+	            fread(empregados[pos]->nome, sizeof(char), 50, arqsInv[0]);
+	            fread(&empregados[pos]->idade, sizeof(int), 1, arqsInv[0]);
+	            fread(&empregados[pos]->salario, sizeof(double), 1, arqsInv[0]);
+	            fread(&empregados[pos]->n_dependentes, sizeof(int), 1, arqsInv[0]);
+
+	            //pula o prox_nome, prox_idade
+	            fseek(arqsInv[0], 2*sizeof(int), SEEK_CUR);
+
+	            fread(&prox_salario, sizeof(int), 1, arqsInv[0]);
+
+	            //pula o prox_n_dependentes
+	            fseek(arqsInv[0], sizeof(int), SEEK_CUR); 
+	          	fseek(arqsInv[0], (prox_salario)*(tamanhoEmpregado() + sizeof(int)), SEEK_SET);    //Indo para a prox idade
+	            //posição do vetor de empregados que será retornado
+	            pos++;
+	    	}
+    	}
+    }
+
+    printf("FIM BUSCA SALARIO\n");
+
+    if(qtdTotal!=0){
+
+    	return empregados;
+    }
+
+    return NULL;
+}
