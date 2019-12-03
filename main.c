@@ -74,10 +74,10 @@ int main(int argc, char *argv[]){
                 if(emps != NULL){
                     if(qtdTotal > 1){    //Precisa escolher um empregado
                         printf("Mais de um empregado com esse nome. Por favor, digite o código do empregado desejado:\n");
-                        for(int i=0;i<resul;i++)
+                        for(int i=0;i<qtdTotal;i++)
                             printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes);
                         scanf(" %d", &cod);
-                         for(int i=0;i<resul;i++){
+                         for(int i=0;i<qtdTotal;i++){
                              if(cod == emps[i]->cod){
                                  d = criarDependente(nome, idade, emps[i]->cod);
                                 inserirHashDep(hashDep, regtsDep, exclsDep, d, tamHash, pD, lD, &qtd_registrosDep);
