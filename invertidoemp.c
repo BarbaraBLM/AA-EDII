@@ -159,7 +159,7 @@ void qsort_cp(Invertido *regs[], int qtd_registros){
 }
 
 FILE** arquivo_invertido_emp(FILE* dados, int qtd_registros){
-    printf("Em arquivo_invertido    -----    -----\n\n");
+
     FILE** ret = malloc(5*sizeof(FILE*));
 
 	for(int i=0; i< 5; i++){
@@ -383,7 +383,6 @@ Empregado** buscaNome(FILE** arqsInv, char* nome, int *qtdTotal){
     rewind(arqsInv[0]);//A8
     rewind(arqsInv[1]);//A5-NOME
 
-    //printf("while 1\n");
     while(fread(n, sizeof(char), 50, arqsInv[1]) > 0){
     	fread(&pt, sizeof(int), 1, arqsInv[1]);    //lendo ponteiro
     	fread(&qtd, sizeof(int), 1, arqsInv[1]);    //lendo qtd
@@ -425,8 +424,6 @@ Empregado** buscaNome(FILE** arqsInv, char* nome, int *qtdTotal){
 	    	}
     	}
     }
-    printf("FIM BUSCA NOME\n");
-
     if(*qtdTotal!=0){
     	return empregados;
     }
@@ -436,14 +433,13 @@ Empregado** buscaNome(FILE** arqsInv, char* nome, int *qtdTotal){
 Empregado** buscaIdadeMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
 	//qtdTotal: quantidade de registros relacionados à busca
 	//arqsInv[2] --> A5-Idade.dat:   IDADE, PT, QTD
-	printf("BUSCA IDADE\n");
+
 	*qtdTotal = 0;
     int pt=0, qtd=0, prox_idade=0, pos=0;
     int idade=0;
     rewind(arqsInv[0]);//A8
     rewind(arqsInv[2]);//A5-IDADE
 
-    //printf("while 1\n");
     while(fread(&idade, sizeof(int), 1, arqsInv[2]) != 0){
 
     	fread(&pt, sizeof(int), 1, arqsInv[2]);
@@ -490,14 +486,10 @@ Empregado** buscaIdadeMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
 	    	}
     	}
     }
-    printf("FIM BUSCA IDADE\n");
 
     if(*qtdTotal!=0){
-    	printf("qtdTotal:%d\n", *qtdTotal);
     	return empregados;
     }
-
-    printf("retornando NULL\n");
     return NULL;
 }
 
@@ -560,8 +552,6 @@ Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
     	}
     }
 
-    printf("FIM BUSCA N_DEPENDENTES\n");
-
     if(*qtdTotal!=0){
 
     	return empregados;
@@ -574,7 +564,6 @@ Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
 Empregado** buscaSalarioMaiorQueX(FILE** arqsInv, double x, int *qtdTotal){
 
 	//arqsInv[3] --> A5-Salario.dat:   SALARIO, PT, QTD
-	printf("BUSCA SALARIO\n");
 	*qtdTotal = 0;
     int pt=0, qtd=0, prox_salario=0, pos=0;
     double salario=0;
@@ -629,8 +618,6 @@ Empregado** buscaSalarioMaiorQueX(FILE** arqsInv, double x, int *qtdTotal){
 	    	}
     	}
     }
-
-    printf("FIM BUSCA SALARIO\n");
 
     if(*qtdTotal!=0){
 
