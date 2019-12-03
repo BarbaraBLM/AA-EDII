@@ -39,7 +39,8 @@ int main(int argc, char *argv[]){
     FILE** arqsInvDep = (FILE**) malloc(5*sizeof(FILE*));
     
 	initHash(hash, tamHash);
-	initHash(hashDep, tamHash);//FRANK COLOCOU ISSO
+	initHash(hashDep, tamHash);
+
 	fwrite(&aux, sizeof(int), 1, excls);
 	while(run == 1){
 		//Status
@@ -61,7 +62,7 @@ int main(int argc, char *argv[]){
                 Empregado *emp = criarEmpregado(nome, idade, salario);
                 inserirHashEmp(hash, regts, excls, emp, tamHash, p, l, &qtd_registros);
                 printf("Empregado inserido!\n\n");
-                arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                arqsInv = arquivo_invertido_emp(regts, qtd_registros);       
 				break;
 			case 2 :    //Cadastrar dependente
                 printf("Digite o nome do Dependente: ");
@@ -73,7 +74,7 @@ int main(int argc, char *argv[]){
                 printf("Digite o nome do Empregado do qual é dependente: ");
                 scanf("%s[^\n]", nome2);
 				fflush(stdin);
-                //arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                arqsInv = arquivo_invertido_emp(regts, qtd_registros);
                 emps = buscaNome(arqsInv, nome2, &qtdTotal);
                 if(emps != NULL){
                     if(qtdTotal > 1){    //Precisa escolher um empregado
@@ -83,25 +84,34 @@ int main(int argc, char *argv[]){
                         scanf(" %d", &cod);
                          for(int i=0;i<qtdTotal;i++){
                              if(cod == emps[i]->cod){
-                                 d = criarDependente(nome, idade, emps[i]->cod);
+                                d = criarDependente(nome, idade, emps[i]->cod);
                                 inserirHashDep(hashDep, regtsDep, exclsDep, d, tamHash, pD, lD, &qtd_registrosDep);
-                                 emps[i]->n_dependentes += 1;
-                                 arqsInvDep = arquivo_invertido_emp(regtsDep, qtd_registrosDep);
                              }
                          }
                     }
                     else{
-                        printf("qtdTotal = 1\n");//por 
+                        printf("qtdTotal = 1\n");
                         for(i=0;i<qtdTotal;i++){
-                            d = criarDependente(nome, idade, emps[i]->cod);    //-->    A SEG FAULT ESTÁ AQUI    (acho q é emps[0]) 
-                            //printf("TESTE    TESTE\n");
+                        	printf("Empregado encontrado:\n");
+                        	imprime_empreg(emps[i]);
+                        	//--------------------------------
+                        	//--------------------------------
+                            d = criarDependente(nome, idade, emps[i]->cod);    //-->    A SEG FAULT ESTÁ AQUI    (acho q é 	)
+                            printf("TESTE   \n");
                             inserirHashDep(hashDep, regtsDep, exclsDep, d, tamHash, pD, lD, &qtd_registrosDep);
-                            arqsInvDep = arquivo_invertido_emp(regtsDep, qtd_registrosDep);
+                            printf("Dep em dep.c:\n");
+                            imprime_dep(d);
+
+                            printf("HASH DEPENDENTE\n");
+                            imprimeHash(hashDep);
+                            imprime_reg(regtsDep, 2);
+
+                            arqsInv = arquivo_invertido_emp(regts, qtd_registros);
                         }
                     }
                 }
                 else    printf("Não foi possível encontrar empregado correspondente.\n\n");
-				break;//por 
+				break;
 			case 3 :    //Buscar
 				printf("1. Buscar Empregado\n2. Buscar Dependente\n3. Voltar\nDigite uma opção: ");
 				scanf("%d", &op);
@@ -292,9 +302,7 @@ int main(int argc, char *argv[]){
                                             default:
                                                 printf("Opção invalida!\n");
                                         
-                                    }
-                                    
-
+                                    } 
                                 }
                                 else    printf("Nenhum empregado com salário maior que %f\n", salario);
 								break;
