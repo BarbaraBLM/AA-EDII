@@ -32,6 +32,7 @@ void imprimeA8(FILE** arqsInv, int qtd_registros);
 Empregado** buscaNome(FILE** arqsInv, char* nome, int* qtd_arqInv);
 Empregado** buscaIdadeMaiorQueX(FILE** arqsInv, int x, int *qtdTotal);
 Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal);
+Empregado** buscaSalarioMaiorQueX(FILE** arqsInv, double x, int *qtdTotal);
 
 
 #endif
