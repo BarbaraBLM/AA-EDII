@@ -394,7 +394,7 @@ Empregado** buscaNome(FILE** arqsInv, char* nome, int *qtdTotal){
     }
     
     Empregado** empregados = malloc((*qtdTotal)*sizeof(Empregado*));
-	for(int i=0; i< *qtdTotal; i++){
+	for(int i=0; i< qtd; i++){
 		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
 	}
 
@@ -426,7 +426,7 @@ Empregado** buscaNome(FILE** arqsInv, char* nome, int *qtdTotal){
     }
     printf("FIM BUSCA NOME\n");
 
-    if(*qtdTotal!=0){
+    if(qtdTotal!=0){
     	return empregados;
     }
     return NULL;
@@ -435,7 +435,7 @@ Empregado** buscaNome(FILE** arqsInv, char* nome, int *qtdTotal){
 Empregado** buscaIdadeMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
 	//qtdTotal: quantidade de registros relacionados à busca
 	//arqsInv[2] --> A5-Idade.dat:   IDADE, PT, QTD
-printf("BUSCA IDADE\n");
+	printf("BUSCA IDADE\n");
 
     int pt=0, qtd=0, prox_idade=0, /*qtdTotal=0, */pos=0;
     int idade=0;
@@ -443,7 +443,7 @@ printf("BUSCA IDADE\n");
     rewind(arqsInv[2]);//A5-IDADE
 
     //printf("while 1\n");
-    while(fread(&idade, sizeof(int), 1, arqsInv[2]) > 0){
+    while(fread(&idade, sizeof(int), 1, arqsInv[2]) != 0){
 
     	fread(&pt, sizeof(int), 1, arqsInv[2]);
     	fread(&qtd, sizeof(int), 1, arqsInv[2]);
@@ -454,14 +454,15 @@ printf("BUSCA IDADE\n");
     	}
     }
 
+
     Empregado** empregados = malloc((*qtdTotal)*sizeof(Empregado*));
-	for(int i=0; i< *qtdTotal; i++){
+	for(int i=0; i< 5; i++){
 		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
 	}
 
     rewind(arqsInv[2]);//A5-IDADE
 
-    while(fread(&idade, sizeof(int), 1, arqsInv[2]) > 0){
+    while(fread(&idade, sizeof(int), 1, arqsInv[2]) != 0){
 
     	fread(&pt, sizeof(int), 1, arqsInv[2]);
     	fread(&qtd, sizeof(int), 1, arqsInv[2]);
@@ -491,10 +492,11 @@ printf("BUSCA IDADE\n");
     printf("FIM BUSCA IDADE\n");
 
     if(*qtdTotal!=0){
-
+    	printf("qtdTotal:%d\n", *qtdTotal);
     	return empregados;
     }
 
+    printf("retornando NULL\n");
     return NULL;
 }
 
@@ -521,7 +523,7 @@ Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
     }
 
     Empregado** empregados = malloc((*qtdTotal)*sizeof(Empregado*));
-	for(int i=0; i< *qtdTotal; i++){
+	for(int i=0; i< 5; i++){
 		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
 	}
 
@@ -568,7 +570,7 @@ Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
     return NULL;
 }
 
-//busca empregados que têm salario maior que X de dependentes
+
 Empregado** buscaSalarioMaiorQueX(FILE** arqsInv, double x, int *qtdTotal){
 
 	//arqsInv[3] --> A5-Salario.dat:   SALARIO, PT, QTD
@@ -591,7 +593,7 @@ Empregado** buscaSalarioMaiorQueX(FILE** arqsInv, double x, int *qtdTotal){
     }
 
     Empregado** empregados = malloc((*qtdTotal)*sizeof(Empregado*));
-	for(int i=0; i< *qtdTotal; i++){
+	for(int i=0; i< 5; i++){
 		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
 	}
 
