@@ -375,8 +375,6 @@ void imprimeA8(FILE** arqsInv, int qtd_registros){
 
 Empregado** buscaNome(FILE** arqsInv, char* nome, int *qtdTotal){
     //arqsInv[1] --> A5-Nome.dat    nome, ED, QTD
-    printf("BUSCA NOME\n");
-
     *qtdTotal =0;
     int pt=0, qtd=0, prox_nome=0, pos=0;
     char n[50];
