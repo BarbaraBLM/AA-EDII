@@ -394,7 +394,7 @@ Empregado** buscaNome(FILE** arqsInv, char* nome, int *qtdTotal){
     }
     
     Empregado** empregados = malloc((*qtdTotal)*sizeof(Empregado*));
-	for(int i=0; i< qtd; i++){
+	for(int i=0; i< *qtdTotal; i++){
 		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
 	}
 
@@ -455,7 +455,7 @@ printf("BUSCA IDADE\n");
     }
 
     Empregado** empregados = malloc((*qtdTotal)*sizeof(Empregado*));
-	for(int i=0; i< 5; i++){
+	for(int i=0; i< *qtdTotal; i++){
 		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
 	}
 
@@ -521,7 +521,7 @@ Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
     }
 
     Empregado** empregados = malloc((*qtdTotal)*sizeof(Empregado*));
-	for(int i=0; i< 5; i++){
+	for(int i=0; i< *qtdTotal; i++){
 		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
 	}
 
@@ -591,7 +591,7 @@ Empregado** buscaSalarioMaiorQueX(FILE** arqsInv, double x, int *qtdTotal){
     }
 
     Empregado** empregados = malloc((*qtdTotal)*sizeof(Empregado*));
-	for(int i=0; i< 5; i++){
+	for(int i=0; i< *qtdTotal; i++){
 		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
 	}
 
