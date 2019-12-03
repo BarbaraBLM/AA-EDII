@@ -371,10 +371,9 @@ void imprimeA8(FILE** arqsInv, int qtd_registros){
 		fread(&prox_n_dependentes, sizeof(int), 1, arqsInv[0]);//ponteiro p/ prox n_dependentes
 		printf("cod %d nome %s idade %d sal %lf ndep %d pnome %d pidade %d psal %d pndep %d\n", cod, nome, idade, salario, n_dependentes, prox_nome, prox_idade, prox_salario, prox_n_dependentes);
 	}
-
 }
 
-Empregado** buscaNome(FILE** arqsInv, char* nome){
+Empregado** buscaNome(FILE** arqsInv, char* nome, int* qtd_arqInv){
     //arqsInv[1] --> A5-Nome.dat    nome, ED, QTD
     printf("Em buscaNome. nome = %s\n", nome);
     printf("size arqsInv = %ld    nome = %s                tamFile* = %ld\n", sizeof(arqsInv), nome, sizeof(FILE*));
@@ -402,6 +401,7 @@ Empregado** buscaNome(FILE** arqsInv, char* nome){
         // Achou ou acabou    ???    ???
         fread(&ed, sizeof(int), 1, arqsInv[1]);    //lendo ed
         fread(&qtd, sizeof(int), 1, arqsInv[1]);    //lendo qtd
+        *qtd_arqInv = qtd;
         if(qtd > 0){
             fseek(arqsInv[0], (ed-1)*(tamanhoEmpregado() + sizeof(int)), SEEK_SET);    //tamEmpregado - 3inst + 4ints
 
