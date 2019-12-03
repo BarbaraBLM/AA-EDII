@@ -6,7 +6,7 @@
 
 typedef struct dependente{
     int cod;
-    char* nome;
+    char nome[50];
     int idade;
     int status;
     int cod_emp;
