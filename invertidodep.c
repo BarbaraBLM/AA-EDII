@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "empregado.h"
 #include "dependente.h"
 #include "invertidodep.h"
 
-Invertido* criaInvertido(){
-	Invertido *novo = (Invertido *)malloc(sizeof(Invertido));
+InvertidoDep* criaInvertidoDep(){
+
+	InvertidoDep *novo = (InvertidoDep *)malloc(sizeof(InvertidoDep));
 	novo->prox_nome = -1;
 	novo->prox_idade = -1;
 	novo->PT = -1;
@@ -15,11 +17,11 @@ Invertido* criaInvertido(){
 	return novo;
 }
 
-void qsort_nome(Invertido *regs[], int qtd_registros){
+void qsort_nomeDep(InvertidoDep *regs[], int qtd_registros){
 
 	if(qtd_registros>1){
 
-		Invertido *x = regs[0];
+		InvertidoDep *x = regs[0];
 		int a = 1;
 		int b = qtd_registros-1;
 
@@ -27,7 +29,7 @@ void qsort_nome(Invertido *regs[], int qtd_registros){
 			while(a<qtd_registros && strcmp(regs[a]->dep->nome,x->dep->nome)<=0) a++;
 			while(strcmp(regs[b]->dep->nome,x->dep->nome)>0) b--;
 			if(a<b){
-				Invertido *temp = regs[a];
+				InvertidoDep *temp = regs[a];
 				regs[a] = regs[b];
 				regs[b] = temp;
 				a++;
@@ -38,16 +40,16 @@ void qsort_nome(Invertido *regs[], int qtd_registros){
 		regs[0] = regs[b];
 		regs[b] = x;
 
-		qsort_nome(regs,b);
-		qsort_nome(&regs[a], qtd_registros-a);
+		qsort_nomeDep(regs,b);
+		qsort_nomeDep(&regs[a], qtd_registros-a);
 	}
 }
 
-void qsort_idade(Invertido *regs[], int qtd_registros){
+void qsort_idadeDep(InvertidoDep *regs[], int qtd_registros){
 
 	if(qtd_registros>1){
 
-		Invertido *x = regs[0];
+		InvertidoDep *x = regs[0];
 		int a = 1;
 		int b = qtd_registros-1;
 
@@ -55,7 +57,7 @@ void qsort_idade(Invertido *regs[], int qtd_registros){
 			while(a<qtd_registros && regs[a]->dep->idade <= x->dep->idade) a++;
 			while(regs[b]->dep->idade > x->dep->idade) b--;
 			if(a<b){
-				Invertido *temp = regs[a];
+				InvertidoDep *temp = regs[a];
 				regs[a] = regs[b];
 				regs[b] = temp;
 				a++;
@@ -66,16 +68,16 @@ void qsort_idade(Invertido *regs[], int qtd_registros){
 		regs[0] = regs[b];
 		regs[b] = x;
 
-		qsort_idade(regs,b);
-		qsort_idade(&regs[a], qtd_registros-a);
+		qsort_idadeDep(regs,b);
+		qsort_idadeDep(&regs[a], qtd_registros-a);
 	}
 }
 
-void qsort_cp(Invertido *regs[], int qtd_registros){
+void qsort_cpDep(InvertidoDep *regs[], int qtd_registros){
 
 	if(qtd_registros>1){
 
-		Invertido *x = regs[0];
+		InvertidoDep *x = regs[0];
 		int a = 1;
 		int b = qtd_registros-1;
 
@@ -83,7 +85,7 @@ void qsort_cp(Invertido *regs[], int qtd_registros){
 			while(a<qtd_registros && regs[a]->ED <= x->ED) a++;
 			while(regs[b]->ED > x->ED) b--;
 			if(a<b){
-				Invertido *temp = regs[a];
+				InvertidoDep *temp = regs[a];
 				regs[a] = regs[b];
 				regs[b] = temp;
 				a++;
@@ -94,8 +96,8 @@ void qsort_cp(Invertido *regs[], int qtd_registros){
 		regs[0] = regs[b];
 		regs[b] = x;
 
-		qsort_cp(regs,b);
-		qsort_cp(&regs[a], qtd_registros-a);
+		qsort_cpDep(regs,b);
+		qsort_cpDep(&regs[a], qtd_registros-a);
 	}
 }
 
@@ -113,21 +115,21 @@ FILE** arquivo_invertido_dep(FILE* dados, int qtd_registros){
 
 	int ant, j;
 
-	Invertido* regs[qtd_registros];
+	InvertidoDep* regs[qtd_registros];
 
 	rewind(dados);//registros
 
 	for (int i = 0; i < qtd_registros; ++i){ //lê todos os dados para a memoria principal
-		regs[i] = criaInvertido();
+		regs[i] = criaInvertidoDep();
 		regs[i]->ED = i;
-		regs[i]->dep = le_depend(dados);
+		regs[i]->dep = le_dep(dados);
 		if(regs[i]->dep->status = 1){
-			imprime_depend(regs[i]->dep);
+			imprime_dep(regs[i]->dep);
 		}
 	}
 	
 	//NOME 1-----------------------------------------
-	qsort_nome(regs, qtd_registros); //Ordena por nome
+	qsort_nomeDep(regs, qtd_registros); //Ordena por nome
 
 	for(int i=0; i<qtd_registros; i++){
 
@@ -163,7 +165,7 @@ FILE** arquivo_invertido_dep(FILE* dados, int qtd_registros){
 	}
 	
 	//IDADE 2----------------------------------------
-	qsort_idade(regs, qtd_registros); //Ordena por idade
+	qsort_idadeDep(regs, qtd_registros); //Ordena por idade
 
 	for(int i=0; i<qtd_registros; i++){
 		if(i < qtd_registros-1 && regs[i]->dep->status == 1){
@@ -198,7 +200,7 @@ FILE** arquivo_invertido_dep(FILE* dados, int qtd_registros){
 		}
 	}
 
-	qsort_cp(regs, qtd_registros);
+	qsort_cpDep(regs, qtd_registros);
 	
 	//A8
 	for (int i = 0; i < qtd_registros; ++i){ 
