@@ -313,14 +313,12 @@ Dependente** buscaIdadeMaiorQueXDep(FILE** arqsInv, int x, int *qtdTotal){
 
 	//qtdTotal: quantidade de registros relacionados à busca
 	//arqsInv[2] --> A5-Idade.dat:   IDADE, PT, QTD
-	printf("BUSCA IDADE DEPENDENTE\n");
 	*qtdTotal = 0;
     int pt=0, qtd=0, prox_idade=0, /*qtdTotal=0, */pos=0;
     int idade=0;
     rewind(arqsInv[0]);//A8
     rewind(arqsInv[2]);//A5-IDADE
 
-    //printf("while 1\n");
     while(fread(&idade, sizeof(int), 1, arqsInv[2]) > 0){
 
     	fread(&pt, sizeof(int), 1, arqsInv[2]);
@@ -367,7 +365,6 @@ Dependente** buscaIdadeMaiorQueXDep(FILE** arqsInv, int x, int *qtdTotal){
 	    	}
     	}
     }
-    printf("FIM BUSCA IDADE DEPENDENTE\n");
 
     if(*qtdTotal!=0){
 
@@ -383,14 +380,12 @@ Dependente** buscaDependentesEmpDep(FILE** arqsInv, int x, int *qtdTotal){
 
 	//qtdTotal: quantidade de registros relacionados à busca
 	//arqsInv[2] --> A5-Idade.dat:   IDADE, PT, QTD
-	printf("BUSCA DEPENDENTES DE UM EMPREGADO\n");
 	*qtdTotal = 0;
     int pt=0, qtd=0, prox_cod_emp=0, /*qtdTotal=0, */pos=0;
     int cod_emp=0;
     rewind(arqsInv[0]);//A8
     rewind(arqsInv[3]);//A5-IDADE
 
-    //printf("while 1\n");
     while(fread(&cod_emp, sizeof(int), 1, arqsInv[3]) > 0){
 
     	fread(&pt, sizeof(int), 1, arqsInv[3]);
@@ -427,8 +422,6 @@ Dependente** buscaDependentesEmpDep(FILE** arqsInv, int x, int *qtdTotal){
 	    //posição do vetor de empregados que será retornado
 	    pos++;
 	}
-
-    printf("FIM BUSCA DEPENDENTES DE UM EMPREGADO\n");
 
     if(*qtdTotal!=0){
 
