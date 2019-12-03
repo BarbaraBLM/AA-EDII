@@ -30,6 +30,6 @@ void qsort_cp(Invertido *regs[], int qtd_registros);
 FILE** arquivo_invertido_emp(FILE* dados, int qtd_registros);
 void imprimeA8(FILE** arqsInv, int qtd_registros);
 Empregado** buscaNome(FILE** arqsInv, char* nome, int* qtd_arqInv);
-Empregado** buscaIdadeMaiorQueX(FILE** arqsInv, int x);
+Empregado** buscaIdadeMaiorQueX(FILE** arqsInv, int x, int *qtdTotal);
 
 #endif
