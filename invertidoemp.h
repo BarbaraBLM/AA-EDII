@@ -1,5 +1,5 @@
-#ifndef INVERTIDOEMP_H
-#define INVERTIDOEMP_H
+#ifndef INVERTIDODEP_H
+#define INVERTIDODEP_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,31 +8,26 @@
 #include "dependente.h"
 #include "empregado.h"
 
-typedef struct invertido{
+typedef struct invertidoDep{
+
     int ED;
     //A8
-    Empregado *emp;
+    Dependente *dep;
     int prox_nome;
     int prox_idade;
-    int prox_salario;
-    int prox_n_dependentes;
+    int prox_cod_emp;
     //A5
     int PT;
     int QTD;
-}Invertido;
+}InvertidoDep;
 
-Invertido* criaInvertido();
-void qsort_nome(Invertido *regs[], int qtd_registros);
-void qsort_idade(Invertido *regs[], int qtd_registros);
-void qsort_salario(Invertido *regs[], int qtd_registros);
-void qsort_ndependentes(Invertido *regs[], int qtd_registros);
-void qsort_cp(Invertido *regs[], int qtd_registros);
-FILE** arquivo_invertido_emp(FILE* dados, int qtd_registros);
-void imprimeA8(FILE** arqsInv, int qtd_registros);
-Empregado** buscaNome(FILE** arqsInv, char* nome, int* qtd_arqInv);
-Empregado** buscaIdadeMaiorQueX(FILE** arqsInv, int x, int *qtdTotal);
-Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal);
-Empregado** buscaSalarioMaiorQueX(FILE** arqsInv, double x, int *qtdTotal);
-
+InvertidoDep* criaInvertidoDep();
+void qsort_nomeDep(InvertidoDep *regs[], int qtd_registros);
+void qsort_idadeDep(InvertidoDep *regs[], int qtd_registros);
+void qsort_cpDep(InvertidoDep *regs[], int qtd_registros);
+FILE** arquivo_invertido_depDep(FILE* dados, int qtd_registros);
+void imprimeA8Dep(FILE** arqsInv, int qtd_registros);
+Dependente** buscaIdadeMaiorQueXDep(FILE** arqsInv, int x, int *qtdTotal);
+Dependente** buscaDependentesEmpDep(FILE** arqsInv, int x, int *qtdTotal);
 
 #endif
