@@ -9,9 +9,9 @@
 
 int main(int argc, char *argv[]){
     int tamHash = atoi(argv[1]);
-    int l = 0;
-    int qtd_registros = 0;
-    int p = 0;
+    int l = 0, lD = 0;
+    int qtd_registros = 0, qtd_registrosDep = 0, qtd_arqInv = 0;
+    int p = 0, pD = 0;
     int aux = -1;
     int run = 1;
     int op, busca = 0, resul = 0, i = 0;
@@ -29,6 +29,10 @@ int main(int argc, char *argv[]){
 	FILE *regts = fopen("registros.dat","w+b");
 	FILE *excls = fopen("exclusao.dat","w+b");
 	FILE *arq_invert_emp[5];
+    
+    FILE *hashDep = fopen("hashDep.dat","w+b");
+	FILE *regtsDep = fopen("registrosDep.dat","w+b");
+	FILE *exclsDep = fopen("exclusaoDep.dat","w+b");
     
     FILE** arqsInv = (FILE**) malloc(5*sizeof(FILE*));
     
@@ -66,24 +70,22 @@ int main(int argc, char *argv[]){
                 scanf("%s[^\n]", nome2);
 				fflush(stdin);
                 arqsInv = arquivo_invertido_emp(regts, qtd_registros);
-                emps = buscaNome(arqsInv, nome2);
+                emps = buscaNome(arqsInv, nome2, &qtd_arqInv);
                 if(emps != NULL){
-                    // -----    -----    -----    SEG FAULT EM emps[i]    !!
-                    resul = sizeof(emps)/sizeof(Empregado*);
-                    printf("Resul :        %d registros   ----    -----\n\nImprimindo:\n", resul);
-                    //Imprimindo aki só p/ teste
-                    for(int i=0;i<resul;i++)
-                            imprime_empreg(emps[i]);    //n imprime
                     
-                    if(resul > 1){    //Precisa escolher um empregado
+                    //Imprimindo aki só p/ teste
+                    for(int i=0;i<qtd_arqInv;i++)
+                            printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes);
+                    
+                    if(qtd_arqInv > 1){    //Precisa escolher um empregado
                         printf("Mais de um empregado com esse nome. Por favor, digite o código do empregado desejado:\n");
                         for(int i=0;i<resul;i++)
-                            imprime_empreg(emps[i]);
+                            printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes);
                         scanf(" %d", &cod);
                          for(int i=0;i<resul;i++){
                              if(cod == emps[i]->cod){
                                  d = criarDependente(nome, idade, emps[i]->cod);
-                                inserirHashDep(hash, regts, excls, d, tamHash, p, l, &qtd_registros);
+                                inserirHashDep(hashDep, regtsDep, exclsDep, d, tamHash, pD, lD, &qtd_registrosDep);
                              }
                          }
                     }
@@ -91,7 +93,7 @@ int main(int argc, char *argv[]){
                         printf("No else    ---    -----    ------\n");
                         d = criarDependente(nome, idade, emps[0]->cod);    //-->    A SEG FAULT ESTÁ AQUI    (acho q é emps[0]) 
                         printf("TESTE    TESTE\n");
-                        inserirHashDep(hash, regts, excls, d, tamHash, p, l, &qtd_registros);
+                        inserirHashDep(hashDep, regtsDep, exclsDep, d, tamHash, pD, lD, &qtd_registrosDep);
                     }
                 }
                 else    printf("Não foi possível encontrar empregado correspondente.\n\n");
@@ -142,13 +144,12 @@ int main(int argc, char *argv[]){
 							case 2 :    //por nome
                                 printf("Digite o nome do empregado: ");
                                 scanf("%s[^\n]", nome);
-                                printf("Dps do scanf                                                -------\n");
-                                emps = buscaNome(arqsInv, nome);
+                                emps = buscaNome(arqsInv, nome, &qtd_arqIn);
                                 printf("Dps de arqsInv    ---    -    -    -\n\n");
                                 if(emps != NULL){
                                     printf("NO IF                    ----------------\n");
                                     resul = sizeof(emps)/sizeof(FILE*);
-                                    printf("reusl = %d            -----                    --", resul);
+                                    printf("resul = %d            sizeof(emps) = %ld\n-----                    --", resul, sizeof(emps));
                                     if(resul == 1){
                                         printf("Empregado encontrado!\n\n1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
                                         scanf("%d", &op);
@@ -248,7 +249,7 @@ int main(int argc, char *argv[]){
 								printf("Opção invalida!\n");
 						}
 						break;
-					case 2 :
+					case 2 :    //buscar Dependente
                         printf("Não implementado ainda!\n\n");
 						break;
 					case 3 :
@@ -262,12 +263,12 @@ int main(int argc, char *argv[]){
 				scanf("%d", &op);
 				fflush(stdin);
 				switch (op){
-					case 1 :
+					case 1 :    //imprimir empregado
 						printf("1. Buscar Codigo\n2. Buscar Nome\n3. Buscar Idade\n4. Buscar Salario\n5. Buscar Número de Dependente\n6. Voltar\nDigite uma opção: ");
 						scanf("%d", &op);
 						fflush(stdin);
 						switch (op){
-							case 1 :
+							case 1 :    //por codigo
 								printf("Digite o codigo do Empregado: ");
 								scanf("%d", &cod);
 								fflush(stdin);
@@ -280,7 +281,7 @@ int main(int argc, char *argv[]){
 								else
 									printf("Empregado NÃO encontrado!\n\n");
 								break;
-							case 2 :
+							case 2 :    //por no
 								printf("Não implementado ainda!\n\n");
 								break;
 							case 3 :
@@ -298,7 +299,38 @@ int main(int argc, char *argv[]){
 								printf("Opção invalida!\n");
 						}
 						break;
-					case 2 :
+					case 2 :    //imprimir dependente
+                        printf("1. Buscar Codigo\n2. Buscar Nome\n3. Buscar Idade\n4. Buscar Codido Empregado\n5. Voltar\nDigite uma opção: ");
+						scanf("%d", &op);
+						fflush(stdin);
+						switch (op){
+							case 1 :    //por codigo
+								printf("Digite o codigo do Dependente: ");
+								scanf("%d", &cod);
+								fflush(stdin);
+								if((end = buscarCodDep(hashDep, regtsDep, cod, tamHash, pD, lD)) != -1){
+									fseek(regtsDep, end*tamanhoDependente(), SEEK_SET);
+                                    d = le_dep(regtsDep);
+                                    imprime_dep(d);
+                                    printf("\n");
+								}
+								else
+									printf("Dependentegado NÃO encontrado!\n\n");
+								break;
+							case 2 :
+								printf("Não implementado ainda!\n\n");
+								break;
+							case 3 :
+								printf("Não implementado ainda!\n\n");
+								break;
+							case 4 :
+								printf("Não implementado ainda!\n\n");
+								break;
+							case 5 :
+								break;
+							default :
+								printf("Opção invalida!\n");
+						}
                         printf("Não implementado ainda!\n\n");
 						break;
 					case 3 :
