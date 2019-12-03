@@ -359,14 +359,17 @@ void expandHashDep(FILE *h, FILE *r, int tam, int* p, int l){
 
 
 int buscarCodEmp(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorna o endereço do arquivo de registros
-	int end_atual;
+	//printf("Em buscarCodEmp\n\n");
+    int end_atual;
 	int chave = hash(cod, tam, l);
-	Empregado* emp;
+	Empregado* emp = (Empregado*) malloc(sizeof(Empregado));
 	if(chave < p){
 		chave = hash(emp->cod, tam, l+1);
 	}
+    
 	fseek(h, chave*sizeof(int), SEEK_SET);
 	fread(&end_atual, sizeof(int), 1, h);
+    //printf("end_atual = %d\n", end_atual);
 	fseek(regts, end_atual*tamanhoEmpregado(), SEEK_SET);
 	emp = le_empreg(regts);
 	if(emp->cod == cod && emp->status == 1)
@@ -377,10 +380,12 @@ int buscarCodEmp(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorn
 			end_atual = emp->prox;
 			emp = le_empreg(regts);
 			if(emp->cod == cod && emp->status == 1)
+                free(emp);
 				return end_atual;
 		}
 	}
-
+    //printf("Dps do else\n\n");
+    free(emp);
 	return -1;
 }
 
