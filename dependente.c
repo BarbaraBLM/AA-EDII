@@ -4,10 +4,12 @@
 #include "dependente.h"
 
 Dependente* criarDependente(char* n, int idade, int cod_emp){
+    printf("Em criar dep\n");
 	int static cod = 1;
     Dependente* e = (Dependente *) malloc(sizeof(Dependente));
     if (e) memset(e, 0, sizeof(Dependente));
     e->cod = cod;
+    printf("Cod = %d        e->cod = %d\n", cod, e->cod);
     cod++;
     strcpy(e->nome, n);
     e->idade = idade;
