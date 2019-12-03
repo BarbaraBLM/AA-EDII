@@ -373,59 +373,61 @@ void imprimeA8(FILE** arqsInv, int qtd_registros){
 	}
 }
 
-Empregado** buscaNome(FILE** arqsInv, char* nome, int* qtd_arqInv){
+Empregado** buscaNome(FILE** arqsInv, char* nome, int *qtdTotal){
     //arqsInv[1] --> A5-Nome.dat    nome, ED, QTD
-    printf("Em buscaNome. nome = %s\n", nome);
-    printf("size arqsInv = %ld    nome = %s                tamFile* = %ld\n", sizeof(arqsInv), nome, sizeof(FILE*));
-    
-    int ed=0, qtd=0, prox_nome=0;
-    char n[50];
-    //printf("teste\n");
-    rewind(arqsInv[1]);
-    //printf("teste\n");
-    //printf("Antes do if\n");
-  
-    if(fread(n, sizeof(char), 50, arqsInv[1]) > 0){
-        //printf("No if -> lemos um nome.        n = %s\n", n);
-        //printf("nome = %s, n = %s, strcmp(nome, n) = %d\n", nome, n, strcmp(n, nome));
-        while(strcmp(n, nome) != 0){    //n são iguais
-            //printf("No while\n");
-            fseek(arqsInv[1], 2*sizeof(int), SEEK_CUR);    //pulando o ED e QTD
-            //printf("Antes do 2 fread\n");
-            fread(n, sizeof(char), 50, arqsInv[1]);
-            //printf("novo n = %s, nome= %s\n", n, nome);
-            //printf("Dps do 2 fread\n");
-            //printf("strcmp(n, nome) = %d\n", strcmp(n, nome));
-        }
-        printf("n certo = %s", n);
-        // Achou ou acabou    ???    ???
-        fread(&ed, sizeof(int), 1, arqsInv[1]);    //lendo ed
-        fread(&qtd, sizeof(int), 1, arqsInv[1]);    //lendo qtd
-        *qtd_arqInv = qtd;
-        if(qtd > 0){
-            fseek(arqsInv[0], (ed-1)*(tamanhoEmpregado() + sizeof(int)), SEEK_SET);    //tamEmpregado - 3inst + 4ints
+    printf("BUSCA NOME\n");
 
-            Empregado** e = (Empregado**) malloc(qtd*sizeof(Empregado*));
-            for(int i=0;i<qtd;i++){
-                e[i] = malloc(sizeof(Empregado*));
-                fread(&e[i]->cod, sizeof(int), 1, arqsInv[0]);
-                fread(e[i]->nome, sizeof(char), 50, arqsInv[0]);
-                fread(&e[i]->idade, sizeof(int), 1, arqsInv[0]);
-                fread(&e[i]->salario, sizeof(float), 1, arqsInv[0]);
-                fread(&e[i]->n_dependentes, sizeof(int), 1, arqsInv[0]);
-                e[i]->prox=0; e[i]->status=1;
-                fread(&prox_nome, sizeof(int), 1, arqsInv[0]);
-                fseek(arqsInv[0], 3*sizeof(int), SEEK_CUR);    //pulando prox_idade, prox_salario, prox_dependentes
-                fseek(arqsInv[0], (prox_nome-1)*(tamanhoEmpregado() + sizeof(int)), SEEK_SET);    //Indo para o prox nome
-            }
-            //printf("Antes do return    -----    -----\n\n");
-            //free(nome_aux);
-            return e;
-        }
+    int pt=0, qtd=0, prox_nome=0, /*qtdTotal=0, */pos=0;
+    char n[50];
+    rewind(arqsInv[0]);//A8
+    rewind(arqsInv[1]);//A5-NOME
+
+    //printf("while 1\n");
+    while(fread(n, sizeof(char), 50, arqsInv[1]) > 0){
+    	fread(&pt, sizeof(int), 1, arqsInv[1]);    //lendo ponteiro
+    	fread(&qtd, sizeof(int), 1, arqsInv[1]);    //lendo qtd
+
+    	if(strcmp(nome, n) == 0){
+    		//quatidade total de resultados para o tamanho do vetor de resultados
+    		*qtdTotal += qtd;
+    	}
     }
-    else{
-        printf("Erro ao ler o arquivo.\n");
-        return NULL;
+    
+    Empregado** empregados = malloc(qtd*sizeof(Empregado*));
+	for(int i=0; i< qtd; i++){
+		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
+	}
+
+    rewind(arqsInv[1]);//A5-NOME
+
+    while(fread(n, sizeof(char), 50, arqsInv[1]) > 0){
+    	fread(&pt, sizeof(int), 1, arqsInv[1]);
+    	fread(&qtd, sizeof(int), 1, arqsInv[1]);
+
+    	if(strcmp(n, nome) == 0){
+    		fseek(arqsInv[0], (pt)*(tamanhoEmpregado() + sizeof(int)) , SEEK_SET);
+
+	    	//lendo todos os registros que atendem ao critério da busca
+	    	for(int i=0; i<qtd; i++){
+	    		fread(&empregados[pos]->cod, sizeof(int), 1, arqsInv[0]);
+	            fread(empregados[pos]->nome, sizeof(char), 50, arqsInv[0]);
+	            fread(&empregados[pos]->idade, sizeof(int), 1, arqsInv[0]);
+	            fread(&empregados[pos]->salario, sizeof(double), 1, arqsInv[0]);
+	            fread(&empregados[pos]->n_dependentes, sizeof(int), 1, arqsInv[0]);
+                fread(&prox_nome, sizeof(int), 1, arqsInv[0]);
+	            //pula o prox_idade, prox_salario, prox_n_dependentes
+	            fseek(arqsInv[0],3*sizeof(int), SEEK_CUR);
+	            
+	          	fseek(arqsInv[0], (prox_nome)*(tamanhoEmpregado() + sizeof(int)), SEEK_SET);    //Indo para a prox nome
+	            //posição do vetor de empregados que será retornado
+	            pos++;
+	    	}
+    	}
+    }
+    printf("FIM BUSCA NOME\n");
+
+    if(qtdTotal!=0){
+    	return empregados;
     }
     return NULL;
 }
@@ -452,7 +454,7 @@ printf("BUSCA IDADE\n");
     	}
     }
 
-    Empregado** empregados = malloc((*qtdTotal)*sizeof(Empregado*));
+    Empregado** empregados = malloc(qtd*sizeof(Empregado*));
 	for(int i=0; i< 5; i++){
 		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
 	}
@@ -495,7 +497,6 @@ printf("BUSCA IDADE\n");
 
     return NULL;
 }
-
 
 //busca empregados que têm quantidade maior que X de dependentes
 Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
