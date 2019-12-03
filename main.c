@@ -39,6 +39,7 @@ int main(int argc, char *argv[]){
     FILE** arqsInvDep = (FILE**) malloc(5*sizeof(FILE*));
     
 	initHash(hash, tamHash);
+	initHash(hashDep, tamHash);//FRANK COLOCOU ISSO
 	fwrite(&aux, sizeof(int), 1, excls);
 	while(run == 1){
 		//Status
