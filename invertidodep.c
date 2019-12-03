@@ -132,15 +132,16 @@ void qsort_cpDep(InvertidoDep *regs[], int qtd_registros){
 
 FILE** arquivo_invertido_dep(FILE* dados, int qtd_registros){
 
-	FILE** ret = malloc(3*sizeof(FILE*));
+	FILE** ret = malloc(4*sizeof(FILE*));
 
-	for(int i=0; i< 3; i++){
+	for(int i=0; i< 4; i++){
 		ret[i] =  malloc(sizeof(FILE*));
 	}
 
 	ret[0] = fopen("A8-dep.dat","w+b");
 	ret[1] = fopen("A5-Nome-dep.dat","w+b");
 	ret[2] = fopen("A5-Idade-dep.dat","w+b");
+	ret[3] = fopen("A5-Cod_emp-dep.dat","w+b");
 
 	int ant, j;
 
@@ -229,8 +230,8 @@ FILE** arquivo_invertido_dep(FILE* dados, int qtd_registros){
 		}
 	}
 
-	//IDADE 3----------------------------------------
-	qsort_idadeDep(regs, qtd_registros); //Ordena por cod_emp
+	//Codido empregado 3----------------------------------------
+	qsort_CodEmpDep(regs, qtd_registros); //Ordena por cod_emp
 
 	for(int i=0; i<qtd_registros; i++){
 		if(i < qtd_registros-1 && regs[i]->dep->status == 1){
