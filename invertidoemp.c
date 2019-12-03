@@ -452,7 +452,7 @@ printf("BUSCA IDADE\n");
     	}
     }
 
-    Empregado** empregados = malloc(5*sizeof(Empregado*));
+    Empregado** empregados = malloc((*qtdTotal)*sizeof(Empregado*));
 	for(int i=0; i< 5; i++){
 		empregados[i] = (Empregado *) malloc(sizeof(Empregado)); //malloc(sizeof(Empregado*));
 	}
