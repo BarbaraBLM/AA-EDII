@@ -6,6 +6,7 @@
 #include "dependente.c"
 #include "hash.c"
 #include "invertidoemp.c"
+#include "invertidodep.c"
 
 int main(int argc, char *argv[]){
     int tamHash = atoi(argv[1]);
