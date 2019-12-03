@@ -136,21 +136,21 @@ int main(int argc, char *argv[]){
                          }
                     }
                     else{
-                        printf("qtdTotal = 1\n");
+                        //printf("qtdTotal = 1\n");
                         for(i=0;i<qtdTotal;i++){
                             printf("Empregado encontrado:\n");
                             imprime_empreg(emps[i]);
                             //--------------------------------
                             //--------------------------------
                             d = criarDependente(nome, idade, emps[i]->cod);    //-->    A SEG FAULT ESTÁ AQUI    (acho q é  )
-                            printf("TESTE   \n");
+                            //printf("TESTE   \n");
                             inserirHashDep(hashDep, regtsDep, exclsDep, d, tamHash, pD, lD, &qtd_registrosDep);
-                            printf("Dep em dep.c:\n");
+                            //printf("Dep em dep.c:\n");
                             imprime_dep(d);
 
-                            printf("HASH DEPENDENTE\n");
-                            imprimeHash(hashDep);
-                            imprime_reg(regtsDep, 2);
+                            //printf("HASH DEPENDENTE\n");
+                            //imprimeHash(hashDep);
+                            //imprime_reg(regtsDep, 2);
 
                             arqsInv = arquivo_invertido_emp(regts, qtd_registros);
                         }
@@ -201,12 +201,11 @@ int main(int argc, char *argv[]){
                                 else
                                     printf("Empregado NÃO encontrado!\n\n");
                                 break;
-                            case 2 :    //por nome    ERRO
+                            case 2 :    //por nome
                                 printf("Digite o nome do empregado: ");
                                 scanf("%s[^\n]", nome);
                                 emps = buscaNome(arqsInv, nome, &qtdTotal);
 
-                                printf("Dps de arqsInv    ---    -    -    -\n\n");
                                 if(emps != NULL){
                                 
                                     if(qtdTotal == 1){
