@@ -6,8 +6,9 @@
 #include <math.h>
 #include <string.h>
 #include "dependente.h"
+#include "empregado.h"
 
-typedef struct invertido{
+typedef struct invertidoDep{
 
     int ED;
     //A8
@@ -17,12 +18,12 @@ typedef struct invertido{
     //A5
     int PT;
     int QTD;
-}Invertido;
+}InvertidoDep;
 
-Invertido* criaInvertido();
-void qsort_nome(Invertido *regs[], int qtd_registros);
-void qsort_idade(Invertido *regs[], int qtd_registros);
-void qsort_cp(Invertido *regs[], int qtd_registros);
-FILE** arquivo_invertido_dep(FILE* dados, int qtd_registros);
+InvertidoDep* criaInvertidoDep();
+void qsort_nomeDep(InvertidoDep *regs[], int qtd_registros);
+void qsort_idadeDep(InvertidoDep *regs[], int qtd_registros);
+void qsort_cpDep(InvertidoDep *regs[], int qtd_registros);
+FILE** arquivo_invertido_depDep(FILE* dados, int qtd_registros);
 
 #endif
