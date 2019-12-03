@@ -10,7 +10,7 @@
 int main(int argc, char *argv[]){
     int tamHash = atoi(argv[1]);
     int l = 0, lD = 0;
-    int qtd_registros = 0, qtd_registrosDep = 0, qtd_arqInv = 0;
+    int qtd_registros = 0, qtd_registrosDep = 0, qtdTotal = 0;
     int p = 0, pD = 0;
     int aux = -1;
     int run = 1;
@@ -70,14 +70,9 @@ int main(int argc, char *argv[]){
                 scanf("%s[^\n]", nome2);
 				fflush(stdin);
                 arqsInv = arquivo_invertido_emp(regts, qtd_registros);
-                emps = buscaNome(arqsInv, nome2, &qtd_arqInv);
+                emps = buscaNome(arqsInv, nome2, &qtdTotal);
                 if(emps != NULL){
-                    
-                    //Imprimindo aki só p/ teste
-                    for(int i=0;i<qtd_arqInv;i++)
-                            printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes);
-                    
-                    if(qtd_arqInv > 1){    //Precisa escolher um empregado
+                    if(qtdTotal > 1){    //Precisa escolher um empregado
                         printf("Mais de um empregado com esse nome. Por favor, digite o código do empregado desejado:\n");
                         for(int i=0;i<resul;i++)
                             printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes);
@@ -90,10 +85,12 @@ int main(int argc, char *argv[]){
                          }
                     }
                     else{
-                        printf("No else    ---    -----    ------\n");
-                        d = criarDependente(nome, idade, emps[0]->cod);    //-->    A SEG FAULT ESTÁ AQUI    (acho q é emps[0]) 
-                        printf("TESTE    TESTE\n");
-                        inserirHashDep(hashDep, regtsDep, exclsDep, d, tamHash, pD, lD, &qtd_registrosDep);
+                        printf("qtdTotal = 1\n");
+                        for(i=0;i<qtdTotal;i++){
+                            d = criarDependente(nome, idade, emps[i]->cod);    //-->    A SEG FAULT ESTÁ AQUI    (acho q é emps[0]) 
+                            //printf("TESTE    TESTE\n");
+                            inserirHashDep(hashDep, regtsDep, exclsDep, d, tamHash, pD, lD, &qtd_registrosDep);
+                        }
                     }
                 }
                 else    printf("Não foi possível encontrar empregado correspondente.\n\n");
@@ -144,7 +141,7 @@ int main(int argc, char *argv[]){
 							case 2 :    //por nome
                                 printf("Digite o nome do empregado: ");
                                 scanf("%s[^\n]", nome);
-                                emps = buscaNome(arqsInv, nome, &qtd_arqIn);
+                                emps = buscaNome(arqsInv, nome, &qtdTotal);
                                 printf("Dps de arqsInv    ---    -    -    -\n\n");
                                 if(emps != NULL){
                                     printf("NO IF                    ----------------\n");
@@ -182,7 +179,7 @@ int main(int argc, char *argv[]){
                                     printf("Idade negativa. Tente novamente.\n");
                                     scanf(" %d", &idade);
                                 }
-                                emps = buscaIdadeMaiorQueX(arqsInv, idade);
+                                emps = buscaIdadeMaiorQueX(arqsInv, idade, &qtdTotal);
                                 if(emps != NULL){
                                     resul = sizeof(emps)/sizeof(Empregado*);
                                     for(int i=0;i<resul;i++){
