@@ -314,7 +314,7 @@ Dependente** buscaIdadeMaiorQueXDep(FILE** arqsInv, int x, int *qtdTotal){
 	//qtdTotal: quantidade de registros relacionados à busca
 	//arqsInv[2] --> A5-Idade.dat:   IDADE, PT, QTD
 	printf("BUSCA IDADE DEPENDENTE\n");
-
+	*qtdTotal = 0;
     int pt=0, qtd=0, prox_idade=0, /*qtdTotal=0, */pos=0;
     int idade=0;
     rewind(arqsInv[0]);//A8
@@ -384,7 +384,7 @@ Dependente** buscaDependentesEmpDep(FILE** arqsInv, int x, int *qtdTotal){
 	//qtdTotal: quantidade de registros relacionados à busca
 	//arqsInv[2] --> A5-Idade.dat:   IDADE, PT, QTD
 	printf("BUSCA DEPENDENTES DE UM EMPREGADO\n");
-
+	*qtdTotal = 0;
     int pt=0, qtd=0, prox_cod_emp=0, /*qtdTotal=0, */pos=0;
     int cod_emp=0;
     rewind(arqsInv[0]);//A8
