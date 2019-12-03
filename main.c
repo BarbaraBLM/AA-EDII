@@ -109,6 +109,7 @@ int main(int argc, char *argv[]){
 								printf("Digite o codigo do Empregado: ");
 								scanf("%d", &cod);
 								fflush(stdin);
+                                printf("teste ---\n");
 								if((end = buscarCodEmp(hash, regts, cod, tamHash, p, l)) != -1){
 									printf("Empregado encontrado!\n\n1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
 									scanf("%d", &op);
