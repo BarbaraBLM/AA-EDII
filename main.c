@@ -34,6 +34,7 @@ int main(int argc, char *argv[]){
     int end, n_dependentes;
 
     /*
+    //a leitura tem que deixar guardados os arquivos inseridos
     FILE *hash;
     FILE *regts;
     FILE *excls;
