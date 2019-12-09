@@ -28,13 +28,22 @@ void imprimeHash(FILE *hash){
 
 void imprime_reg(FILE* r, int c){
     rewind(r);
+
     if(c == 1){
-        Empregado* e = (Empregado*) malloc(tamanhoEmpregado());
-        imprime_empreg(le_empreg(r));
+    	Empregado* e = (Empregado*) malloc(tamanhoEmpregado());
+        e = le_empreg(r);
+        while(e!=NULL){
+        	imprime_empreg(e);
+        	e = le_empreg(r);
+        }
     }
     else if(c == 2){
-        Dependente* e = (Dependente*) malloc(tamanhoDependente());
-        imprime_dep(le_dep(r));
+        Dependente* d = (Dependente*) malloc(tamanhoDependente());
+        d = le_dep(r);
+        while(d!=NULL){
+        	imprime_dep(d);
+        	d = le_dep(r);
+        }
     }
     else    printf("Opção inválida.\n");
 }
@@ -108,6 +117,7 @@ void inserirHashEmp(FILE *h, FILE *r, FILE *exclusao, Empregado *emp, int tam, i
 			fwrite(&excl, sizeof(int), 1, h);
 			fseek(exclusao, end_excl*sizeof(int), SEEK_SET);
 			fwrite(&end_excl, sizeof(int), 1, exclusao);
+			*qtd_registros += 1;
 		}
 		else{
 			fseek(r, 0, SEEK_END);
@@ -169,6 +179,7 @@ void inserirHashDep(FILE *h, FILE *r, FILE *exclusao, Dependente *dep, int tam, 
 			fwrite(&excl, sizeof(int), 1, h);
 			fseek(exclusao, end_excl*sizeof(int), SEEK_SET);
 			fwrite(&end_excl, sizeof(int), 1, exclusao);
+			*qtd_registros += 1;
 		}
 		else{
 			fseek(r, 0, SEEK_END);
@@ -193,7 +204,11 @@ void inserirHashDep(FILE *h, FILE *r, FILE *exclusao, Dependente *dep, int tam, 
 			salva_dep(dep, r);
 			dep_aux->prox = excl;
 			fseek(r, end_atual*tamanhoDependente(), SEEK_SET);
+			printf("antes\n");
+			imprime_dep(dep_aux);
 			salva_dep(dep_aux, r);
+			printf("depois\n");
+			imprime_dep(dep_aux);
 			fseek(exclusao, end_excl*sizeof(int), SEEK_SET);
 			fwrite(&end_excl, sizeof(int), 1, exclusao);
 		}
@@ -366,10 +381,10 @@ int buscarCodEmp(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorn
 	if(chave < p){
 		chave = hash(emp->cod, tam, l+1);
 	}
-    
+
 	fseek(h, chave*sizeof(int), SEEK_SET);
 	fread(&end_atual, sizeof(int), 1, h);
-    //printf("end_atual = %d\n", end_atual);
+	if(end_atual == -1)	return -1;
 	fseek(regts, end_atual*tamanhoEmpregado(), SEEK_SET);
 	emp = le_empreg(regts);
 	if(emp->cod == cod && emp->status == 1)
@@ -390,6 +405,7 @@ int buscarCodEmp(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorn
 }
 
 int buscarCodDep(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorna o endereço do arquivo de registros
+	printf("Em buscarCodDep			-----\n");
 	int end_atual;
 	int chave = hash(cod, tam, l);
 	Dependente* dep;
@@ -398,6 +414,7 @@ int buscarCodDep(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorn
 	}
 	fseek(h, chave*sizeof(int), SEEK_SET);
 	fread(&end_atual, sizeof(int), 1, h);
+	if(end_atual == -1)	return -1;
 	fseek(regts, end_atual*tamanhoDependente(), SEEK_SET);
 	dep = le_dep(regts);
 	if(dep->cod == cod && dep->status == 1)
@@ -416,10 +433,7 @@ int buscarCodDep(FILE *h, FILE* regts, int cod, int tam, int p, int l){ //retorn
 }
 
 void excluirHashEmp(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int l, int *qtd_registros){
-    int aux,
-    chave, 
-    excl,
-    end_ant;
+    int aux, chave, excl, end_ant;
     Empregado* emp;
     Empregado* prox;
 
@@ -445,7 +459,7 @@ void excluirHashEmp(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, i
     		fseek(exclusao, excl*sizeof(int), SEEK_SET);
     		fwrite(&end, sizeof(int), 1, exclusao);
     		fseek(h, chave*sizeof(int), SEEK_SET);
-    		fwrite(&emp->prox, sizeof(int), 1, h);
+    		fwrite(&emp->prox, sizeof(int), 1, h);	//			?????			?????
     		emp->status = -1;
     		fseek(r, end*tamanhoEmpregado(), SEEK_SET);
     		salva_empreg(emp, r);
@@ -587,4 +601,75 @@ void excluirHashDep(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, i
     	}
     }
     *qtd_registros -=1;
+}
+
+void incrementa_ndepEmp(FILE* h, FILE* r, int cod, int tam, int l){
+	int pos=0, nd = 0;
+	int chave = hash(cod, tam, l);
+	rewind(h);
+	fseek(h, chave*sizeof(int), SEEK_SET);
+	if(fread(&pos, sizeof(int), 1, h) != 0){
+		rewind(r);
+		fseek(r, pos*tamanhoEmpregado() + sizeof(int)+ 50*sizeof(char) + sizeof(int) + sizeof(double), SEEK_SET);	//paramos em ndependetes
+		fread(&nd, sizeof(int), 1, r);
+		fseek(r, -sizeof(int), SEEK_CUR);
+		nd = nd + 1;
+		fwrite(&nd, sizeof(int), 1, r);
+	}
+}
+
+void decrementa_ndepEmp(FILE* h, FILE* r, int cod, int tam, int l){
+	int pos=0, nd = 0;
+	int chave = hash(cod, tam, l);
+	rewind(h);
+	fseek(h, chave*sizeof(int), SEEK_SET);
+	if(fread(&pos, sizeof(int), 1, h) != 0){
+		rewind(r);
+		fseek(r, pos*tamanhoEmpregado() + sizeof(int)+ 50*sizeof(char) + sizeof(int) + sizeof(double), SEEK_SET);	//paramos em ndependetes
+		fread(&nd, sizeof(int), 1, r);
+		fseek(r, -sizeof(int), SEEK_CUR);
+		nd -= 1; 
+		fwrite(&nd, sizeof(int), 1, r);
+	}
+}
+
+void alteraNomeEmp(FILE* h, FILE* r, int cod, int tam, int l, char* n){
+	int pos=0;
+	int chave = hash(cod, tam, l);
+	rewind(h);
+	fseek(h, chave*sizeof(int), SEEK_SET);
+	if(fread(&pos, sizeof(int), 1, h) != 0){
+		rewind(r);
+		fseek(r, pos*tamanhoEmpregado() + sizeof(int), SEEK_SET);
+		fwrite(n, sizeof(char), 50, r);
+	}
+}
+
+
+void alteraIdadeEmp(FILE* h, FILE* r, int cod, int tam, int l, int idade){
+	int pos=0;
+	int chave = hash(cod, tam, l);
+	rewind(h);
+	fseek(h, chave*sizeof(int), SEEK_SET);
+	if(fread(&pos, sizeof(int), 1, h) != 0){
+		rewind(r);
+		if(pos != -1){
+			fseek(r, pos*tamanhoEmpregado() + sizeof(int) + 50*sizeof(char), SEEK_SET);
+			fwrite(&idade, sizeof(int), 1, r);
+		}
+	}
+}
+
+void alteraSalarioEmp(FILE* h, FILE* r, int cod, int tam, int l, double salario){
+	int pos=0;
+	int chave = hash(cod, tam, l);
+	rewind(h);
+	fseek(h, chave*sizeof(int), SEEK_SET);
+	if(fread(&pos, sizeof(int), 1, h) != 0){
+		rewind(r);
+		if(pos != -1){
+			fseek(r, pos*tamanhoEmpregado() + sizeof(int) + 50*sizeof(char) + sizeof(int), SEEK_SET);
+			fwrite(&salario, sizeof(double), 1, r);
+		}
+	}
 }
