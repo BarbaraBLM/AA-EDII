@@ -17,5 +17,10 @@ int buscarCodEmp(FILE *h, FILE* regts, int cod, int tam, int p, int l);
 int buscarCodDep(FILE *h, FILE* regts, int cod, int tam, int p, int l);
 void excluirHashEmp(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int l, int *qtd_registros);
 void excluirHashDep(FILE *h, FILE *r, FILE *exclusao, int end, int tam, int p, int l, int *qtd_registros);
+void incrementa_ndepEmp(FILE* h, FILE* r, int cod, int tam, int l);
+void decrementa_ndepEmp(FILE* h, FILE* r, int cod, int tam, int l);
+alteraNomeEmp(FILE* h, FILE* r, int cod, int tam, int l, char* n);
+void alteraIdadeEmp(FILE* h, FILE* r, int cod, int tam, int l, int idade);
+void alteraSalarioEmp(FILE* hash, FILE* regts, int cod, inttamHash, int l, double salario);
 
 #endif
