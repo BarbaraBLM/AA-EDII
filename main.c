@@ -110,11 +110,10 @@ int main(int argc, char *argv[]){
                 fflush(stdin);
                 Empregado *emp = criarEmpregado(nomeEmpregado, idade, salario);
                 inserirHashEmp(hash, regts, excls, emp, tamHash, p, l, &qtd_registros);
-                printf("Empregado inserido! QUANTIDADE: %d\n\n", qtd_registros);
+                printf("Empregado inserido! %d\n\n", qtd_registros);
                 arqsInv = arquivo_invertido_emp(regts, qtd_registros);       
                 break;
             case 2 :    //Cadastrar dependente
-
                 printf("Digite o nome do Dependente: ");
                 scanf("%s[^\n]", nomeDependente);
                 fflush(stdin);
@@ -248,6 +247,15 @@ int main(int argc, char *argv[]){
                                                 arqsInv = arquivo_invertido_emp(regts, qtd_registros);
                                                 break;
                                             case 2 :
+                                                printf("O que deseja modificar:\n1.Nome\n2.Idade\n3.Salario\n4.Voltar\n(Para modificar n_dependetes, deve-se excluir o dependente)\nDigite uma opção: ");
+                                                scanf(" %d", &op);
+                                                switch (op){
+                                                    case 1:    //modificar nome
+                                                        printf("Digite novo nome: ");
+                                                        scanf(" %s[^\n]", nomeEmpregado);
+                                                        alteraNomeEmp(hash, regts, emps[0]->cod, tamHash, l, nomeEmpregado);
+                                                        arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                                                        break;
                                                 case 2:	//idade
                                             		printf("Digite nova idade: ");
                                             		scanf(" %d", &idade);
@@ -264,8 +272,9 @@ int main(int argc, char *argv[]){
                                             		break;
                                            		default :
 		                                            printf("Opção invalida!\n");
-                                        }
+                                            }
                                     }
+                                }
                                 }else{
                                     printf("Não há empregado cadastrado para o nome '%s'\n", nomeEmpregado);
                                 }
@@ -791,7 +800,7 @@ int main(int argc, char *argv[]){
                 printf("Opção invalida!\n");
         }
 
-        printf("\n\nHash empregado:\n");
+        /*printf("\n\nHash empregado:\n");
         imprimeHash(hash);
         printf("Registros de empregados\n");
         imprime_reg(regts, 1);
@@ -800,7 +809,7 @@ int main(int argc, char *argv[]){
         imprimeHash(hashDep);
         printf("Registros de dependentes\n");
         imprime_reg(regtsDep, 2);
-        printf("\n\n");
+        printf("\n\n");*/
     }
 
     //arquivos do empregado
