@@ -1,5 +1,7 @@
-//    ATENÇÃO : argumento de linha de comando = tamanho da Hash. Rode: .\exe tam
-#include <stdio.h>
+/*    ATENÇÃO	ATENÇÃO		ATENÇÃO
+Rode: .\exe tamanhoHash		, sendo tamanhoHash um inteiro
+*/
+
 #include <stdlib.h>
 #include <string.h>
 #include "empregado.c"
@@ -9,10 +11,8 @@
 #include "invertidodep.c"
 
 /*
-
     para ler, preservando o conteúdo: r+b
     usar w+b apenas se o arquivo não existir
-
 */
 
 int main(int argc, char *argv[]){
@@ -24,11 +24,12 @@ int main(int argc, char *argv[]){
     int run = 1;
     int op, busca = 0, resul = 0, i = 0;
     Empregado* emp_aux;
+    Dependente* dep_aux;
     Empregado** emps;
-    Dependente* d;
+    Dependente** deps;
     
     int cod;
-    char nome[50], nome2[50];
+    char nomeEmpregado[50], nomeDependente[50];
     int idade = 0;
     double salario;
     int end, n_dependentes;
@@ -87,18 +88,19 @@ int main(int argc, char *argv[]){
     initHash(hashDep, tamHash);
 
     arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+    arqsInvDep = arquivo_invertido_dep(regtsDep, qtd_registrosDep);
 
     fwrite(&aux, sizeof(int), 1, excls);
+    fwrite(&aux, sizeof(int), 1, exclsDep);
     while(run == 1){
         //Status
-
         printf("1. Cadastrar Empregado\n2. Cadastrar Dependente\n3. Buscar\n4. Imprimir\n5. Sair\nDigite uma opção: ");
         scanf("%d", &op);
         fflush(stdin);
         switch (op){
             case 1 :    //Cadastrar empregado
                 printf("Digite o nome do Empregado: ");
-                scanf("%s[^\n]", nome);                
+                scanf("%s[^\n]", nomeEmpregado);                
                 fflush(stdin);
                 printf("Idade do Empregado: ");
                 scanf(" %d", &idade);
@@ -106,23 +108,24 @@ int main(int argc, char *argv[]){
                 printf("Salario do Empregado: ");
                 scanf(" %lf", &salario);
                 fflush(stdin);
-                Empregado *emp = criarEmpregado(nome, idade, salario);
+                Empregado *emp = criarEmpregado(nomeEmpregado, idade, salario);
                 inserirHashEmp(hash, regts, excls, emp, tamHash, p, l, &qtd_registros);
-                printf("Empregado inserido!\n\n");
+                printf("Empregado inserido! QUANTIDADE: %d\n\n", qtd_registros);
                 arqsInv = arquivo_invertido_emp(regts, qtd_registros);       
                 break;
             case 2 :    //Cadastrar dependente
+
                 printf("Digite o nome do Dependente: ");
-                scanf("%s[^\n]", nome);
+                scanf("%s[^\n]", nomeDependente);
                 fflush(stdin);
                 printf("Idade do Dependente: ");
                 scanf(" %d", &idade);
                 fflush(stdin);
                 printf("Digite o nome do Empregado do qual é dependente: ");
-                scanf("%s[^\n]", nome2);
+                scanf("%s[^\n]", nomeEmpregado);
                 fflush(stdin);
     
-                emps = buscaNome(arqsInv, nome2, &qtdTotal);
+                emps = buscaNome(arqsInv, nomeEmpregado, &qtdTotal);
                 if(emps != NULL){
                     if(qtdTotal > 1){    //Precisa escolher um empregado
                         printf("Mais de um empregado com esse nome. Por favor, digite o código do empregado desejado:\n");
@@ -131,29 +134,26 @@ int main(int argc, char *argv[]){
                         scanf(" %d", &cod);
                          for(int i=0;i<qtdTotal;i++){
                              if(cod == emps[i]->cod){
-                                d = criarDependente(nome, idade, emps[i]->cod);
-                                inserirHashDep(hashDep, regtsDep, exclsDep, d, tamHash, pD, lD, &qtd_registrosDep);
-                             }
+                                Dependente* dep = criarDependente(nomeDependente, idade, emps[i]->cod);
+                                inserirHashDep(hashDep, regtsDep, exclsDep, dep, tamHash, pD, lD, &qtd_registrosDep);
+                                incrementa_ndepEmp(hash, regts, emps[i]->cod, tamHash, l);
+                                printf("Registros de dependentes\n");
+                                arqsInvDep = arquivo_invertido_dep(regtsDep, qtd_registrosDep);
+                                arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                            }
                          }
                     }
                     else{
                         //printf("qtdTotal = 1\n");
                         for(i=0;i<qtdTotal;i++){
                             printf("Empregado encontrado:\n");
-                            imprime_empreg(emps[i]);
-                            //--------------------------------
-                            //--------------------------------
-                            d = criarDependente(nome, idade, emps[i]->cod);    //-->    A SEG FAULT ESTÁ AQUI    (acho q é  )
-                            //printf("TESTE   \n");
-                            inserirHashDep(hashDep, regtsDep, exclsDep, d, tamHash, pD, lD, &qtd_registrosDep);
-                            //printf("Dep em dep.c:\n");
-                            imprime_dep(d);
-
-                            //printf("HASH DEPENDENTE\n");
-                            //imprimeHash(hashDep);
-                            //imprime_reg(regtsDep, 2);
-
-                            arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                            incrementa_ndepEmp(hash, regts, emps[i]->cod, tamHash, l);
+                            printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes+1);
+                            Dependente* dep = criarDependente(nomeDependente, idade, emps[i]->cod);
+                            imprime_dep(dep);
+                            inserirHashDep(hashDep, regtsDep, exclsDep, dep, tamHash, pD, lD, &qtd_registrosDep);
+                            
+                            arqsInvDep = arquivo_invertido_dep(regtsDep, qtd_registrosDep);
                         }
                     }
                 }
@@ -173,20 +173,47 @@ int main(int argc, char *argv[]){
                                 printf("Digite o codigo do Empregado: ");
                                 scanf("%d", &cod);
                                 fflush(stdin);
-                                printf("teste ---\n");
                                 if((end = buscarCodEmp(hash, regts, cod, tamHash, p, l)) != -1){
                                     printf("Empregado encontrado!\n\n1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
                                     scanf("%d", &op);
                                     fflush(stdin);
                                     switch (op){
-                                        case 1 :
+                                        case 1 :	//excluir
                                             excluirHashEmp(hash, regts, excls, end, tamHash, p, l, &qtd_registros);
-                                            printf("Empregado Excluido!\n");    //SEG FAULT*/
+                                            printf("Empregado Excluido! QUANTIDADE: %d\n", qtd_registros);
                                             break;
-                                        case 2 :
-                                            printf("Não implementado ainda!\n\n");
-                                            break;
-                                        case 3 :
+                                        case 2 :	//modificar
+                                            printf("O que deseja modificar:\n1.Nome\n2.Idade\n3.Salario\n4.Voltar\n(Para modificar n_dependetes, deve-se excluir o dependente)\nDigite uma opção: ");
+                                            scanf(" %d", &op);
+                                            fflush(stdin);
+                                            switch (op){
+                                            	case 1:	//nome
+                                            		printf("Digite novo nome: ");
+                                            		scanf(" %s[^\n]", nomeEmpregado);
+                                            		alteraNomeEmp(hash, regts, cod, tamHash, l, nomeEmpregado);
+                                            		arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                                            		break;
+                                            	case 2:	//idade
+                                            		printf("Digite nova idade: ");
+                                            		scanf(" %d", &idade);
+                                            		alteraIdadeEmp(hash, regts, cod, tamHash, l, idade);
+                                            		arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                                            		break;
+                                            	case 3:	//salario
+                                            		printf("Digite novo salário: ");
+                                            		scanf(" %lf", &salario);
+                                            		alteraSalarioEmp(hash, regts, cod, tamHash, l, salario);
+                                            		arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                                            		break;
+                                            	case 4:
+                                            		break;
+                                           		default :
+		                                            printf("Opção invalida!\n");
+                                            }
+                                            printf("Empregado Excluido!\n");
+                                            arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                                        break;
+                                        case 3 :	//imprimir
                                             fseek(regts, end*tamanhoEmpregado(), SEEK_SET);
                                             emp_aux = le_empreg(regts);
                                             imprime_empreg(emp_aux);
@@ -204,8 +231,8 @@ int main(int argc, char *argv[]){
                                 break;
                             case 2 :    //por nome
                                 printf("Digite o nome do empregado: ");
-                                scanf("%s[^\n]", nome);
-                                emps = buscaNome(arqsInv, nome, &qtdTotal);
+                                scanf("%s[^\n]", nomeEmpregado);
+                                emps = buscaNome(arqsInv, nomeEmpregado, &qtdTotal);
 
                                 if(emps != NULL){
                                 
@@ -215,28 +242,35 @@ int main(int argc, char *argv[]){
                                         fflush(stdin);
                                         switch (op){
                                             case 1 :
-                                                printf("Não implementado ainda\n");
-                                                /*excluirHash(hash, regts, excls, end, tamHash, p, l);
-                                                printf("Empregado Excluido!\n");    SEG FAULT*/
+                                                end = buscarCodEmp(hash, regts, emps[0]->cod, tamHash, p, l);
+                                                excluirHashEmp(hash, regts, excls, end, tamHash, p, l, &qtd_registros);
+                                                printf("Empregado Excluido!\n");
+                                                arqsInv = arquivo_invertido_emp(regts, qtd_registros);
                                                 break;
                                             case 2 :
-                                                printf("Não implementado ainda!\n\n");
-                                                break;
-                                            case 3 :
-                                                imprime_empreg(emps[0]);
-                                                printf("\n");
-                                                break;
-                                            case 4 :
-                                                break;
-                                            default :
-                                                printf("Opção invalida!\n");
+                                                case 2:	//idade
+                                            		printf("Digite nova idade: ");
+                                            		scanf(" %d", &idade);
+                                            		alteraIdadeEmp(hash, regts, cod, tamHash, l, idade);
+                                            		arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                                            		break;
+                                            	case 3:	//salario
+                                            		printf("Digite novo salário: ");
+                                            		scanf(" %lf", &salario);
+                                            		alteraSalarioEmp(hash, regts, cod, tamHash, l, salario);
+                                            		arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                                            		break;
+                                            	case 4:
+                                            		break;
+                                           		default :
+		                                            printf("Opção invalida!\n");
                                         }
                                     }
                                 }else{
-                                    printf("Não há empregado cadastrado para o nome '%s'\n", nome);
+                                    printf("Não há empregado cadastrado para o nome '%s'\n", nomeEmpregado);
                                 }
                                 break;
-                            case 3 :    //por idade    ERRO  (id > maior_id)
+                            case 3 :    //por idade
                                 printf("Buscar empregados com idade maior que: ");
                                 scanf(" %d", &idade);
                                 while(idade < 0){
@@ -245,13 +279,11 @@ int main(int argc, char *argv[]){
                                 }
                                 emps = buscaIdadeMaiorQueX(arqsInv, idade, &qtdTotal);
                                 if(emps != NULL){
-                                    
                                     for(int i=0;i<qtdTotal;i++){
                                         printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes);
                                     }
                                     if(qtdTotal > 1){
                                         printf("Empregados encontrados!\nDeseja alterar algum desses registros?\n1. Sim\n2. Não\n");
-                                        printf("Empregado encontrado!\n\n1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
                                         scanf(" %d", &op);
                                         switch (op){
                                             case 1:
@@ -283,8 +315,10 @@ int main(int argc, char *argv[]){
                                                          excluirHashEmp(hash, regts, excls, i, tamHash, p, l, &qtd_registros);
                                                         break;
                                                     case 2:
+                                                        printf("Não implementado ainda!\n\n");
                                                         break;
                                                     case 3:
+                                                        printf("Não implementado ainda!\n\n");
                                                         break;
                                                     case 4:
                                                         break;
@@ -294,7 +328,7 @@ int main(int argc, char *argv[]){
                                         }
                                     }
                                 }
-                                else printf("Nenhum empregado com idade maior que %f\n", salario);;
+                                else printf("Nenhum empregado com idade maior que %d\n", idade);
                                 break;
                             case 4 :    //por salario
                                 printf("Buscar empregados com salário maior que : ");
@@ -324,7 +358,7 @@ int main(int argc, char *argv[]){
                                                 switch (op){
                                                     case 1:    //modificar nome
                                                         printf("Digite novo nome: ");
-                                                        scanf(" %s[^\n]", nome);
+                                                        scanf(" %s[^\n]", nomeEmpregado);
                                                         //        Mudar nome me arq regts
                                                         break;
                                                     case 2:    //modificar idade
@@ -333,8 +367,10 @@ int main(int argc, char *argv[]){
                                                         //        Mudar atriome me arq regts
                                                         break;
                                                     case 3:    //modificar salario
+                                                        printf("Não implementado ainda!\n\n");
                                                         break;
                                                     case 4:    //modificar n_dependentes
+                                                        printf("Não implementado ainda!\n\n");
                                                         break;
                                                     default:
                                                         printf("Opção invalida!\n");
@@ -342,6 +378,7 @@ int main(int argc, char *argv[]){
                                                 }
                                                 break;
                                             case 3:
+                                                printf("Não implementado ainda!\n\n");
                                                 break;
                                             case 4:
                                                 break;
@@ -350,7 +387,7 @@ int main(int argc, char *argv[]){
                                         
                                     } 
                                 }
-                                else    printf("Nenhum empregado com salário maior que %f\n", salario);
+                                else    printf("Nenhum empregado com salário maior que %.2f\n", salario);
                                 break;
                             case 5 :    //por n_dependentes
                                 printf("Buscar empregados com número de dependentes maior que : ");
@@ -381,7 +418,7 @@ int main(int argc, char *argv[]){
                                                 switch (op){
                                                     case 1:    //modificar nome
                                                         printf("Digite novo nome: ");
-                                                        scanf(" %s[^\n]", nome);
+                                                        scanf(" %s[^\n]", nomeEmpregado);
                                                         //        Mudar nome me arq regts
                                                         break;
                                                     case 2:    //modificar idade
@@ -390,8 +427,10 @@ int main(int argc, char *argv[]){
                                                         //        Mudar atriome me arq regts
                                                         break;
                                                     case 3:    //modificar salario
+                                                        printf("Não implementado ainda!\n\n");
                                                         break;
                                                     case 4:    //modificar n_dependentes
+                                                        printf("Não implementado ainda!\n\n");
                                                         break;
                                                     default:
                                                         printf("Opção invalida!\n");
@@ -399,6 +438,7 @@ int main(int argc, char *argv[]){
                                                 }
                                                 break;
                                             case 3:
+                                                printf("Não implementado ainda!\n\n");
                                                 break;
                                             case 4:
                                                 break;
@@ -407,23 +447,223 @@ int main(int argc, char *argv[]){
                                         
                                     } 
                                 }
-                                else    printf("Nenhum empregado com número de dependentes maior que %f\n", salario);
+                                else    printf("Nenhum empregado com número de dependentes maior que %d\n", n_dependentes);
                                 break;//-------------------------
                             case 6 :
-                                break;
+                            break;
                             default :
                                 printf("Opção invalida!\n");
                         }
                         break;
                     case 2 :    //buscar Dependente
-                        printf("Não implementado ainda!\n\n");
-                        break;
+                        printf("1. Buscar codigo\n2. Buscar nome\n3. Buscar idade menor que\n4. Buscar idade maior que\n5. Voltar\nDigite uma opção: ");
+                        scanf("%d", &op);
+                        fflush(stdin);
+                        switch(op){
+                            case 1:
+                                printf("Digite o codigo do dependente: ");
+                                scanf("%d", &cod);
+                                fflush(stdin);
+                                if((end = buscarCodDep(hashDep, regtsDep, cod, tamHash, pD, lD)) != -1){
+                                    printf("Dependente encontrado!\n\n1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
+                                    scanf("%d", &op);
+                                    fflush(stdin);
+                                    switch (op){
+                                        case 1 :
+                                            excluirHashDep(hashDep, regtsDep, exclsDep, end, tamHash, pD, lD, &qtd_registrosDep);
+                                            printf("Dependente Excluido!\n");    //SEG FAULT*/
+                                            arqsInvDep = arquivo_invertido_dep(regtsDep, qtd_registrosDep);
+                                            break;
+                                        case 2 :
+                                        	printf("Não implementado ainda.\n");
+                                            break;
+                                        case 3 :
+                                            fseek(regtsDep, end*tamanhoDependente(), SEEK_SET);
+                                            dep_aux = le_dep(regtsDep);
+                                            imprime_dep(dep_aux);
+                                            free(dep_aux);
+                                            printf("\n");
+                                            break;
+                                        case 4 :
+                                            break;
+                                        default :
+                                            printf("Opção invalida!\n");
+                                    }
+                                }
+                                else
+                                    printf("Dependente NÃO encontrado!\n\n");
+                            break;
+
+                            case 2: // 
+                                printf("Digite o nome do dependente: ");
+                                scanf("%s[^\n]", nomeDependente);
+                                deps = buscaNomeDep(arqsInvDep, nomeDependente, &qtdTotal);
+
+                                if(deps != NULL){
+                                
+                                    if(qtdTotal == 1){
+                                        printf("Dependente encontrado!\n\n1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
+                                        scanf("%d", &op);
+                                        fflush(stdin);
+                                        switch (op){
+                                            case 1 :
+                                                end = buscarCodDep(hashDep, regtsDep, deps[0]->cod, tamHash, pD, lD);
+                                                excluirHashDep(hashDep, regtsDep, exclsDep, end, tamHash, pD, lD, &qtd_registrosDep);
+                                                printf("Dependente Excluido!\n");    //SEG FAULT*/
+                                                arqsInvDep = arquivo_invertido_dep(regtsDep, qtd_registrosDep);
+                                                break;
+                                            case 2 :
+                                                printf("Não implementado ainda\n");
+                                                break;
+                                            case 3 :
+                                                imprime_dep(deps[0]);
+                                                printf("\n");
+                                                break;
+                                            case 4 :
+                                                break;
+                                            default :
+                                                printf("Opção invalida!\n");
+                                        }
+                                    }
+                                }else{
+                                    printf("Não há dependente cadastrado para o nome '%s'\n", nomeEmpregado);
+                                }
+                            break;
+
+                            case 3:
+                                printf("Buscar por idade menor que: ");
+                                scanf("%d", &idade);
+                                deps = buscaIdadeMenorQueXDep(arqsInvDep, idade, &qtdTotal);
+
+                                if(deps != NULL){
+
+                                    for(i=0;i<qtdTotal;i++)
+                                        printf("\n\nDependente:\nCod: %d\nNome: %s\nIdade:%d\nCod empregado:%d\n", deps[i]->cod, deps[i]->nome, deps[i]->idade, deps[i]->cod_emp);
+                                        
+                                    if(qtdTotal > 1){
+                                        printf("Mais de um dependente encontrado. Por favor, digite o código do dependente desejado:\n");
+                                        scanf(" %d", &cod);
+                                        for(i=0;i<qtdTotal;i++){
+                                            if(deps[i]->cod == cod)    break;
+                                        }
+                                    }else    i=0;
+
+                                    printf("1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
+                                    scanf(" %d", &op);
+                                    switch(op){
+                                        case 1:    //excluir
+                                            end = buscarCodDep(hashDep, regtsDep, deps[i]->cod, tamHash, pD, lD);
+                                            excluirHashDep(hashDep, regtsDep, exclsDep, end, tamHash, pD, lD, &qtd_registrosDep);
+                                            printf("Dependente Excluido!\n");    //SEG FAULT*/
+                                            arqsInvDep = arquivo_invertido_dep(regtsDep, qtd_registrosDep);
+                                        break;
+
+                                        case 2:    //modificar
+                                            printf("Qual atributo gostaria de modificar?\n1. Nome\n2. Idade\n");
+                                            scanf(" %d", &op);
+                                            switch (op){
+                                                case 1:    //modificar nome
+                                                    printf("Não implementado ainda!\n\n");
+                                                break;
+
+                                                case 2:    //modificar idade
+                                                    printf("Não implementado ainda!\n\n");
+                                                break;
+
+                                                default:
+                                                    printf("Opção invalida!\n");       
+                                            }
+                                        break;
+
+                                        case 3://Imprimir
+                                            imprime_dep(deps[i]);
+                                            printf("\n\n");
+                                        break;
+
+                                        case 4://Voltar
+                                        break;
+
+                                        default:
+                                        printf("Opção invalida!\n");
+                                    } 
+                                }
+                                else    printf("Nenhum empregado com salário maior que %f\n", salario);
+                            break;
+
+                            case 4:
+                                printf("Buscar por idade maior que: ");
+                                scanf("%d", &idade);
+                                deps = buscaIdadeMaiorQueXDep(arqsInvDep, idade, &qtdTotal);
+
+                                if(deps != NULL){
+
+                                    for(i=0;i<qtdTotal;i++)
+                                        printf("\n\nDependente:\nCod: %d\nNome: %s\nIdade:%d\nCod empregado:%d\n", deps[i]->cod, deps[i]->nome, deps[i]->idade, deps[i]->cod_emp);
+                                        
+                                    if(qtdTotal > 1){
+                                        printf("Mais de um dependente encontrado. Por favor, digite o código do dependente desejado:\n");
+                                        scanf(" %d", &cod);
+                                        for(i=0;i<qtdTotal;i++){
+                                            if(deps[i]->cod == cod)    break;
+                                        }
+                                    }else    i=0;
+
+                                    printf("1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
+                                    scanf(" %d", &op);
+                                    switch(op){
+                                        case 1:    //excluir
+                                            end = buscarCodDep(hashDep, regtsDep, deps[i]->cod, tamHash, pD, lD);
+                                            excluirHashDep(hashDep, regtsDep, exclsDep, end, tamHash, pD, lD, &qtd_registrosDep);
+                                            printf("Dependente Excluido!\n");    //SEG FAULT*/
+                                            arqsInvDep = arquivo_invertido_dep(regtsDep, qtd_registrosDep);
+                                        break;
+
+                                        case 2:    //modificar
+                                            printf("Qual atributo gostaria de modificar?\n1. Nome\n2. Idade\n");
+                                            scanf(" %d", &op);
+                                            switch (op){
+                                                case 1:    //modificar nome
+                                                    printf("Não implementado ainda!\n\n");
+                                                break;
+
+                                                case 2:    //modificar idade
+                                                    printf("Não implementado ainda!\n\n");
+                                                break;
+
+                                                default:
+                                                    printf("Opção invalida!\n");       
+                                            }
+                                        break;
+
+                                        case 3://Imprimir
+                                            imprime_dep(deps[i]);
+                                            printf("\n\n");
+                                        break;
+
+                                        case 4://Voltar
+                                        break;
+
+                                        default:
+                                        printf("Opção invalida!\n");
+                                    } 
+                                }
+                                else    printf("Nenhum empregado com salário maior que %f\n", salario);
+                            break;
+                            case 5:
+                            break;
+                            default:
+                            printf("Opção invalida!\n");
+                        }
+                    break;
+
                     case 3 :
-                        break;
+                    break;
+
                     default :
-                        printf("Opção invalida!\n");
+                    printf("Opção invalida!\n");
                 }
-                break;
+            break;
+
             case 4 :    //Imprimir
                 printf("Deseja imprimir\n1. Empregado\n2. Dependente\n3. Voltar\nDigite uma opção: ");
                 scanf("%d", &op);
@@ -447,19 +687,58 @@ int main(int argc, char *argv[]){
                                 else
                                     printf("Empregado NÃO encontrado!\n\n");
                                 break;
-                            case 2 :    //por no
-                                printf("Não implementado ainda!\n\n");
+                            case 2 :    //por nome
+                                printf("Digite o nome do empregado: ");
+                                scanf("%s[^\n]", nomeEmpregado);
+                                emps = buscaNome(arqsInv, nomeEmpregado, &qtdTotal);
+
+                                if(emps != NULL){
+                                    if(qtdTotal == 1){
+                                        printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[0]->cod, emps[0]->nome, emps[0]->idade, emps[0]->salario, emps[0]->n_dependentes);
+                                    }
+                                }
+                                else{
+                                    printf("Não há empregado cadastrado para o nome '%s'\n", nomeEmpregado);
+                                }
                                 break;
-                            case 3 :
-                                printf("Não implementado ainda!\n\n");
+                            case 3 : //por idade
+                                printf("Buscar empregados com idade maior que: ");
+                                scanf(" %d", &idade);
+                                while(idade < 0){
+                                    printf("Idade negativa. Tente novamente.\n");
+                                    scanf(" %d", &idade);
+                                }
+                                emps = buscaIdadeMaiorQueX(arqsInv, idade, &qtdTotal);
+                                if(emps != NULL){
+                                    for(int i=0;i<qtdTotal;i++){
+                                        printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes);
+                                    }
+                                }
+                                else printf("Nenhum empregado com idade maior que %d\n", idade);
                                 break;
-                            case 4 :
-                                printf("Não implementado ainda!\n\n");
+                            case 4 ://por salario
+                                printf("Buscar empregados com salário maior que : ");
+                                scanf(" %lf", &salario);
+                                emps = buscaSalarioMaiorQueX(arqsInv, salario, &qtdTotal);
+                                if(emps != NULL){
+                                    for(i=0;i<qtdTotal;i++){
+                                        printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes);
+                                    }
+                                }
+                                else    printf("Nenhum empregado com salário maior que %.2f\n", salario);
                                 break;
-                            case 5 :
-                                printf("Não implementado ainda!\n\n");
+                            case 5 ://por numero de depentes
+                                printf("Buscar empregados com número de dependentes maior que : ");
+                                scanf(" %d", &n_dependentes);
+                                emps = buscaNumDepMaiorQueX(arqsInv, n_dependentes, &qtdTotal);
+                                if(emps != NULL){
+                                    for(i=0;i<qtdTotal;i++){
+                                        printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes);
+                                    }
+                                }
+                                else    printf("Nenhum empregado com número de dependentes maior que %d\n", n_dependentes);
                                 break;
-                            case 6 :
+                            case 6 ://volta
                                 break;
                             default :
                                 printf("Opção invalida!\n");
@@ -476,8 +755,8 @@ int main(int argc, char *argv[]){
                                 fflush(stdin);
                                 if((end = buscarCodDep(hashDep, regtsDep, cod, tamHash, pD, lD)) != -1){
                                     fseek(regtsDep, end*tamanhoDependente(), SEEK_SET);
-                                    d = le_dep(regtsDep);
-                                    imprime_dep(d);
+                                    Dependente* dep = le_dep(regtsDep);
+                                    imprime_dep(dep);
                                     printf("\n");
                                 }
                                 else
@@ -511,6 +790,17 @@ int main(int argc, char *argv[]){
             default :
                 printf("Opção invalida!\n");
         }
+
+        printf("\n\nHash empregado:\n");
+        imprimeHash(hash);
+        printf("Registros de empregados\n");
+        imprime_reg(regts, 1);
+
+        printf("\n\nHash dependente\n");
+        imprimeHash(hashDep);
+        printf("Registros de dependentes\n");
+        imprime_reg(regtsDep, 2);
+        printf("\n\n");
     }
 
     //arquivos do empregado
