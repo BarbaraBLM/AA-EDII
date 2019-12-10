@@ -187,7 +187,6 @@ FILE** arquivo_invertido_emp(FILE* dados, int qtd_registros){
 	//NOME 1-----------------------------------------
 	qsort_nome(regs, qtd_registros); //Ordena por nome
 
-	printf("QUANDIDADE:%d\n", qtd_registros);
 	for(int i=0; i<qtd_registros; i++){
 
 		printf("olha\n");
