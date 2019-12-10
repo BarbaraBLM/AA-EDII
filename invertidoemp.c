@@ -187,17 +187,17 @@ FILE** arquivo_invertido_emp(FILE* dados, int qtd_registros){
 	//NOME 1-----------------------------------------
 	qsort_nome(regs, qtd_registros); //Ordena por nome
 
-	printf("QUANTIDADE:%d\n", qtd_registros);
+	printf("QUANDIDADE:%d\n", qtd_registros);
 	for(int i=0; i<qtd_registros; i++){
 
+		printf("olha\n");
 		imprime_empreg(regs[i]->emp);
-		printf("\n\n");
+		printf("\n\n\n");
 		if(i < qtd_registros-1 && regs[i]->emp->status == 1){
 			ant=i;
 			j=i+1;
 			while(j<qtd_registros && strcmp(regs[i]->emp->nome, regs[j]->emp->nome) == 0){
 				if(regs[ant]->emp->status==1 && regs[j]->emp->status==1){
-					printf("Indo prox\n");
 					regs[ant]->prox_nome = regs[j]->ED;
 					regs[i]->QTD += 1;
 					ant = j;
@@ -380,7 +380,7 @@ void imprimeA8(FILE** arqsInv, int qtd_registros){
 Empregado** buscaNome(FILE** arqsInv, char* nome, int *qtdTotal){
     //arqsInv[1] --> A5-Nome.dat    nome, ED, QTD
 
-    *qtdTotal = 0;
+    *qtdTotal =0;
     int pt=0, qtd=0, prox_nome=0, pos=0;
     char n[50];
     rewind(arqsInv[0]);//A8
@@ -500,6 +500,7 @@ Empregado** buscaIdadeMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
 
 //busca empregados que têm quantidade maior que X de dependentes
 Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
+
 	//arqsInv[4] --> A5-Ndependts.dat:   N_DEPENDENTS, PT, QTD
 	*qtdTotal = 0;
     int pt=0, qtd=0, prox_n_dependentes=0, pos=0;
@@ -508,11 +509,9 @@ Empregado** buscaNumDepMaiorQueX(FILE** arqsInv, int x, int *qtdTotal){
     rewind(arqsInv[4]);//A5-IDADE
 
     while(fread(&n_dependentes, sizeof(int), 1, arqsInv[4]) > 0){
-    	//printf("Em while											----\n");
 
     	fread(&pt, sizeof(int), 1, arqsInv[4]);
     	fread(&qtd, sizeof(int), 1, arqsInv[4]);
-    	printf("n_dependentes : %d		---\n", n_dependentes);
 
     	if(n_dependentes>x){
     		//quatidade total de resultados para o tamanho do vetor de resultados
