@@ -34,44 +34,6 @@ int main(int argc, char *argv[]){
     double salario;
     int end, n_dependentes;
 
-    /*
-    //a leitura tem que deixar guardados os arquivos inseridos
-    FILE *hash;
-    FILE *regts;
-    FILE *excls;
-    
-    FILE *hashDep;
-    FILE *regtsDep;
-    FILE *exclsDep;
-
-    
-    if ((hash = fopen("hash.dat","r+b")) == NULL) {
-
-        hash = fopen("hash.dat","w+b");
-    }
-    if ((regts = fopen("registros.dat","r+b")) == NULL) {
-
-        regts = fopen("registros.dat","w+b");
-    }
-    if ((excls = fopen("exclusao.dat","r+b")) == NULL) {
-
-        excls = fopen("exclusao.dat","w+b");
-    }
-
-
-    if ((hashDep = fopen("hashDep.dat","r+b")) == NULL) {
-
-        hashDep = fopen("hashDep.dat","w+b");
-    }
-    if ((regtsDep = fopen("registrosDep.dat","r+b")) == NULL) {
-
-        regtsDep = fopen("registrosDep.dat","w+b");
-    }
-    if ((exclsDep = fopen("exclusaoDep.dat","r+b")) == NULL) {
-
-        excls = fopen("exclusaoDep.dat","w+b");
-    }*/
-
     
     FILE *hash = fopen("hash.dat","w+b");
     FILE *regts = fopen("registros.dat","w+b");
@@ -100,7 +62,9 @@ int main(int argc, char *argv[]){
         switch (op){
             case 1 :    //Cadastrar empregado
                 printf("Digite o nome do Empregado: ");
-                scanf("%s[^\n]", nomeEmpregado);                
+                setbuf(stdin, NULL);
+                fgets(nomeEmpregado,50,stdin);
+                clean_fgets_error(nomeEmpregado);
                 fflush(stdin);
                 printf("Idade do Empregado: ");
                 scanf(" %d", &idade);
@@ -115,13 +79,19 @@ int main(int argc, char *argv[]){
                 break;
             case 2 :    //Cadastrar dependente
                 printf("Digite o nome do Dependente: ");
-                scanf("%s[^\n]", nomeDependente);
+                setbuf(stdin, NULL);
+                fgets(nomeDependente,50,stdin);
+                clean_fgets_error(nomeDependente);
                 fflush(stdin);
+
                 printf("Idade do Dependente: ");
                 scanf(" %d", &idade);
                 fflush(stdin);
                 printf("Digite o nome do Empregado do qual é dependente: ");
-                scanf("%s[^\n]", nomeEmpregado);
+                setbuf(stdin, NULL);
+                fgets(nomeEmpregado,50,stdin);
+                clean_fgets_error(nomeEmpregado);
+
                 fflush(stdin);
     
                 emps = buscaNome(arqsInv, nomeEmpregado, &qtdTotal);
@@ -179,7 +149,6 @@ int main(int argc, char *argv[]){
                                     switch (op){
                                         case 1 :	//excluir
                                             excluirHashEmp(hash, regts, excls, end, tamHash, p, l, &qtd_registros);
-                                            printf("Empregado Excluido! QUANTIDADE: %d\n", qtd_registros);
                                             break;
                                         case 2 :	//modificar
                                             printf("O que deseja modificar:\n1.Nome\n2.Idade\n3.Salario\n4.Voltar\n(Para modificar n_dependetes, deve-se excluir o dependente)\nDigite uma opção: ");
@@ -188,7 +157,11 @@ int main(int argc, char *argv[]){
                                             switch (op){
                                             	case 1:	//nome
                                             		printf("Digite novo nome: ");
-                                            		scanf(" %s[^\n]", nomeEmpregado);
+                                                    setbuf(stdin, NULL);
+                                                    fgets(nomeEmpregado,50,stdin);
+                                                    clean_fgets_error(nomeEmpregado);
+                                                    fflush(stdin);
+
                                             		alteraNomeEmp(hash, regts, cod, tamHash, l, nomeEmpregado);
                                             		arqsInv = arquivo_invertido_emp(regts, qtd_registros);
                                             		break;
@@ -209,7 +182,6 @@ int main(int argc, char *argv[]){
                                            		default :
 		                                            printf("Opção invalida!\n");
                                             }
-                                            printf("Empregado Excluido!\n");
                                             arqsInv = arquivo_invertido_emp(regts, qtd_registros);
                                         break;
                                         case 3 :	//imprimir
@@ -230,7 +202,10 @@ int main(int argc, char *argv[]){
                                 break;
                             case 2 :    //por nome
                                 printf("Digite o nome do empregado: ");
-                                scanf("%s[^\n]", nomeEmpregado);
+                                setbuf(stdin, NULL);
+                                fgets(nomeEmpregado,50,stdin);
+                                clean_fgets_error(nomeEmpregado);
+                                fflush(stdin);
                                 emps = buscaNome(arqsInv, nomeEmpregado, &qtdTotal);
 
                                 if(emps != NULL){
@@ -245,14 +220,17 @@ int main(int argc, char *argv[]){
                                                 excluirHashEmp(hash, regts, excls, end, tamHash, p, l, &qtd_registros);
                                                 printf("Empregado Excluido!\n");
                                                 arqsInv = arquivo_invertido_emp(regts, qtd_registros);
-                                                break;
+                                            break;
                                             case 2 :
                                                 printf("O que deseja modificar:\n1.Nome\n2.Idade\n3.Salario\n4.Voltar\n(Para modificar n_dependetes, deve-se excluir o dependente)\nDigite uma opção: ");
                                                 scanf(" %d", &op);
                                                 switch (op){
                                                     case 1:    //modificar nome
                                                         printf("Digite novo nome: ");
-                                                        scanf(" %s[^\n]", nomeEmpregado);
+                                                        setbuf(stdin, NULL);
+                                                        fgets(nomeEmpregado,50,stdin);
+                                                        clean_fgets_error(nomeEmpregado);
+                                                        fflush(stdin);
                                                         alteraNomeEmp(hash, regts, emps[0]->cod, tamHash, l, nomeEmpregado);
                                                         arqsInv = arquivo_invertido_emp(regts, qtd_registros);
                                                         break;
@@ -272,6 +250,7 @@ int main(int argc, char *argv[]){
                                             		break;
                                            		default :
 		                                            printf("Opção invalida!\n");
+                                                break;
                                             }
                                     }
                                 }
@@ -291,20 +270,30 @@ int main(int argc, char *argv[]){
                                     for(int i=0;i<qtdTotal;i++){
                                         printf("\n\nEmpregado:\nCod: %d\nNome: %s\nIdade:%d\nSalario:%f\nNº dependentes:%d\n", emps[i]->cod, emps[i]->nome, emps[i]->idade, emps[i]->salario, emps[i]->n_dependentes);
                                     }
+
                                     if(qtdTotal > 1){
+                                        printf("Mais de um empregado encontrado. Por favor, digite o código do empregado desejado:\n");
+                                        scanf(" %d", &cod);
+                                        for(i=0;i<qtdTotal;i++){
+                                            if(emps[i]->cod == cod)    break;
+                                        }
+                                    } else    i=0;
+
                                         printf("Empregados encontrados!\nDeseja alterar algum desses registros?\n1. Sim\n2. Não\n");
                                         scanf(" %d", &op);
                                         switch (op){
                                             case 1:
+
                                                 printf("Digite o código do registro: ");
                                                 scanf(" %d", &cod);
-                                                do{
-                                                    for(int i=0;i<resul;i++){
+
+                                                for(int i=0;i<qtdTotal;i++){
                                                     if(cod == emps[i]->cod)
-                                                        break;
-                                                    }
-                                                    if(i==resul-1)    printf("Código não encontrado.\n");
-                                                }while(i == resul-1);
+                                                         break;
+                                                }
+                                                if(i==qtdTotal)    printf("Código não encontrado.\n");
+
+
                                                 printf("1. Excluir\n2. Modificar\n3. Imprimir\n4. Voltar\nDigite uma opção: ");
                                                 scanf(" %d", &op);
                                                 switch(op){
@@ -321,11 +310,41 @@ int main(int argc, char *argv[]){
                                                             fseek(arqsInv[0], sizeof(double), SEEK_CUR);//pula salario
                                                             fseek(arqsInv[0], 5*sizeof(int), SEEK_CUR);//pula n_dependentes, prox_
                                                         }
-                                                         excluirHashEmp(hash, regts, excls, i, tamHash, p, l, &qtd_registros);
+                                                        excluirHashEmp(hash, regts, excls, i, tamHash, p, l, &qtd_registros);
+                                                        arqsInv = arquivo_invertido_emp(regts, qtd_registros);
                                                         break;
                                                     case 2:
+                                                        printf("O que deseja modificar:\n1.Nome\n2.Idade\n3.Salario\n4.Voltar\n(Para modificar n_dependetes, deve-se excluir o dependente)\nDigite uma opção: ");
+                                                        scanf(" %d", &op);
+                                                        switch (op){
+                                                            case 1:    //modificar nome
+                                                                printf("Digite novo nome: ");
+                                                                setbuf(stdin, NULL);
+                                                                fgets(nomeEmpregado,50,stdin);
+                                                                clean_fgets_error(nomeEmpregado);
+                                                                fflush(stdin);
+                                                                alteraNomeEmp(hash, regts, emps[i]->cod, tamHash, l, nomeEmpregado);
+                                                                arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                                                                break;
+                                                        case 2: //idade
+                                                            printf("Digite nova idade: ");
+                                                            scanf(" %d", &idade);
+                                                            alteraIdadeEmp(hash, regts, cod, tamHash, l, idade);
+                                                            arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                                                            break;
+                                                        case 3: //salario
+                                                            printf("Digite novo salário: ");
+                                                            scanf(" %lf", &salario);
+                                                            alteraSalarioEmp(hash, regts, cod, tamHash, l, salario);
+                                                            arqsInv = arquivo_invertido_emp(regts, qtd_registros);
+                                                            break;
+                                                        case 4:
+                                                            break;
+                                                        default :
+                                                            printf("Opção invalida!\n");
+                                                        }                                                   
                                                         printf("Não implementado ainda!\n\n");
-                                                        break;
+                                                    break;
                                                     case 3:
                                                         printf("Não implementado ainda!\n\n");
                                                         break;
@@ -333,9 +352,11 @@ int main(int argc, char *argv[]){
                                                         break;
                                                     default:
                                                         printf("Opção invalida!\n");
-                                                }
+                                            }
+                                        case 2:
+                                            break;
                                         }
-                                    }
+                                    
                                 }
                                 else printf("Nenhum empregado com idade maior que %d\n", idade);
                                 break;
@@ -367,7 +388,10 @@ int main(int argc, char *argv[]){
                                                 switch (op){
                                                     case 1:    //modificar nome
                                                         printf("Digite novo nome: ");
-                                                        scanf(" %s[^\n]", nomeEmpregado);
+                                                        setbuf(stdin, NULL);
+                                                        fgets(nomeEmpregado,50,stdin);
+                                                        clean_fgets_error(nomeEmpregado);
+                                                        fflush(stdin);
                                                         //        Mudar nome me arq regts
                                                         break;
                                                     case 2:    //modificar idade
@@ -427,12 +451,14 @@ int main(int argc, char *argv[]){
                                                 switch (op){
                                                     case 1:    //modificar nome
                                                         printf("Digite novo nome: ");
-                                                        scanf(" %s[^\n]", nomeEmpregado);
+                                                        setbuf(stdin, NULL);
+                                                        fgets(nomeEmpregado,50,stdin);
+                                                        clean_fgets_error(nomeEmpregado);
+                                                        fflush(stdin);
                                                         //        Mudar nome me arq regts
                                                         break;
                                                     case 2:    //modificar idade
-                                                        printf("Digite nova idade: ");
-                                                        scanf(" %d", &idade);
+                                                        printf("Não implementado ainda!\n\n");
                                                         //        Mudar atriome me arq regts
                                                         break;
                                                     case 3:    //modificar salario
@@ -505,7 +531,10 @@ int main(int argc, char *argv[]){
 
                             case 2: // 
                                 printf("Digite o nome do dependente: ");
-                                scanf("%s[^\n]", nomeDependente);
+                                setbuf(stdin, NULL);
+                                fgets(nomeDependente,50,stdin);
+                                clean_fgets_error(nomeDependente);
+                                fflush(stdin);
                                 deps = buscaNomeDep(arqsInvDep, nomeDependente, &qtdTotal);
 
                                 if(deps != NULL){
@@ -698,7 +727,10 @@ int main(int argc, char *argv[]){
                                 break;
                             case 2 :    //por nome
                                 printf("Digite o nome do empregado: ");
-                                scanf("%s[^\n]", nomeEmpregado);
+                                setbuf(stdin, NULL);
+                                fgets(nomeEmpregado,50,stdin);
+                                clean_fgets_error(nomeEmpregado);
+                                fflush(stdin);
                                 emps = buscaNome(arqsInv, nomeEmpregado, &qtdTotal);
 
                                 if(emps != NULL){
@@ -799,17 +831,6 @@ int main(int argc, char *argv[]){
             default :
                 printf("Opção invalida!\n");
         }
-
-        /*printf("\n\nHash empregado:\n");
-        imprimeHash(hash);
-        printf("Registros de empregados\n");
-        imprime_reg(regts, 1);
-
-        printf("\n\nHash dependente\n");
-        imprimeHash(hashDep);
-        printf("Registros de dependentes\n");
-        imprime_reg(regtsDep, 2);
-        printf("\n\n");*/
     }
 
     //arquivos do empregado
@@ -821,14 +842,6 @@ int main(int argc, char *argv[]){
     fclose(hashDep);
     fclose(regtsDep);
     fclose(exclsDep);
-
-
-    /*
-    for(int i=0; i<5; i++){
-
-        fclose(arqsInv[i]);
-        fclose(arqsInvDep[i]);
-    }*/
 
     printf("Programa finalizado!!!\n");
     return 0;
