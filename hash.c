@@ -673,3 +673,12 @@ void alteraSalarioEmp(FILE* h, FILE* r, int cod, int tam, int l, double salario)
 		}
 	}
 }
+
+//Remove o '\n' que o fgets salva ao ler string
+void clean_fgets_error(char str[]){
+
+	for(int i=0; str[i] != '\0'; i++){
+		if(str[i]=='\n')
+			str[i]='\0';
+	}
+}
