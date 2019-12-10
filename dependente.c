@@ -58,3 +58,4 @@ int tamanhoDependente(){
          + sizeof(int)         //cod_emp
          + sizeof(int);        //prox
 }
+
