@@ -26,9 +26,11 @@ void qsort_nomeDep(InvertidoDep *regs[], int qtd_registros);
 void qsort_idadeDep(InvertidoDep *regs[], int qtd_registros);
 void qsort_CodEmpDep(InvertidoDep *regs[], int qtd_registros);
 void qsort_cpDep(InvertidoDep *regs[], int qtd_registros);
-FILE** arquivo_invertido_depDep(FILE* dados, int qtd_registros);
+FILE** arquivo_invertido_dep(FILE* dados, int qtd_registros);
 void imprimeA8Dep(FILE** arqsInv, int qtd_registros);
+Dependente** buscaNomeDep(FILE** arqsInv, char* nome, int *qtdTotal);
 Dependente** buscaIdadeMaiorQueXDep(FILE** arqsInv, int x, int *qtdTotal);
-Dependente** buscaDependentesEmpDep(FILE** arqsInv, int x, int *qtdTotal);
+Dependente** buscaIdadeMenorQueXDep(FILE** arqsInv, int x, int *qtdTotal);
+Dependente** buscaDependentesEmpDep(FILE** arqsInv, int codEmpregado, int *qtdTotal);
 
 #endif
