@@ -22,5 +22,8 @@ void decrementa_ndepEmp(FILE* h, FILE* r, int cod, int tam, int l);
 alteraNomeEmp(FILE* h, FILE* r, int cod, int tam, int l, char* n);
 void alteraIdadeEmp(FILE* h, FILE* r, int cod, int tam, int l, int idade);
 void alteraSalarioEmp(FILE* hash, FILE* regts, int cod, inttamHash, int l, double salario);
+//Remove o '\n' que o fgets salva ao ler string
+void clean_fgets_error(char str[]);
+
 
 #endif
