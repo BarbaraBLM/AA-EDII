@@ -309,6 +309,66 @@ void imprimeA8Dep(FILE** arqsInv, int qtd_registros){
 }
 
 
+
+Dependente** buscaNomeDep(FILE** arqsInv, char* nome, int *qtdTotal){
+    //arqsInv[1] --> A5-Nome-dep.dat    nome, ED, QTD
+
+    *qtdTotal =0;
+    int pt=0, qtd=0, prox_nome=0, pos=0;
+    char n[50];
+    rewind(arqsInv[0]);//A8
+    rewind(arqsInv[1]);//A5-NOME
+
+    while(fread(n, sizeof(char), 50, arqsInv[1]) > 0){
+    	fread(&pt, sizeof(int), 1, arqsInv[1]);    //lendo ponteiro
+    	fread(&qtd, sizeof(int), 1, arqsInv[1]);    //lendo qtd
+
+    	if(strcmp(nome, n) == 0){
+    		//quatidade total de resultados para o tamanho do vetor de resultados
+    		*qtdTotal += qtd;
+    	}
+    }
+    
+    Dependente** dependentes = malloc((*qtdTotal)*sizeof(Empregado*));
+	for(int i=0; i< (*qtdTotal); i++){
+		dependentes[i] = (Dependente *) malloc(sizeof(Dependente)); 
+	}
+
+    rewind(arqsInv[1]);//A5-NOME-DEP
+
+    while(fread(n, sizeof(char), 50, arqsInv[1]) > 0){
+    	fread(&pt, sizeof(int), 1, arqsInv[1]);
+    	fread(&qtd, sizeof(int), 1, arqsInv[1]);
+
+    	if(strcmp(n, nome) == 0){
+    		fseek(arqsInv[0], (pt)*(tamanhoEmpregado() + sizeof(int)) , SEEK_SET);
+
+	    	//lendo todos os registros que atendem ao critério da busca
+	    	for(int i=0; i<qtd; i++){
+
+	    		fread(&dependentes[pos]->cod, sizeof(int), 1, arqsInv[0]);
+	            fread(dependentes[pos]->nome, sizeof(char), 50, arqsInv[0]);
+	            fread(&dependentes[pos]->idade, sizeof(int), 1, arqsInv[0]);
+	            fread(&dependentes[pos]->cod_emp, sizeof(int), 1, arqsInv[0]);
+	            
+                fread(&prox_nome, sizeof(int), 1, arqsInv[0]);
+
+	            //pula o prox_idade, prox_cod_emp
+	            fseek(arqsInv[0],2*sizeof(int), SEEK_CUR);
+	            	            
+	          	fseek(arqsInv[0], (prox_nome)*(tamanhoDependente() + sizeof(int)), SEEK_SET);    //Indo para a prox nome
+	            //posição do vetor de empregados que será retornado
+	            pos++;
+	    	}
+    	}
+    }
+    if(*qtdTotal!=0){
+    	return dependentes;
+    }
+    return NULL;
+}
+
+
 Dependente** buscaIdadeMaiorQueXDep(FILE** arqsInv, int x, int *qtdTotal){
 
 	//qtdTotal: quantidade de registros relacionados à busca
@@ -374,12 +434,76 @@ Dependente** buscaIdadeMaiorQueXDep(FILE** arqsInv, int x, int *qtdTotal){
     return NULL;
 }
 
-
-//retorna um vetor com os dependentes de uma chave
-Dependente** buscaDependentesEmpDep(FILE** arqsInv, int x, int *qtdTotal){
+Dependente** buscaIdadeMenorQueXDep(FILE** arqsInv, int x, int *qtdTotal){
 
 	//qtdTotal: quantidade de registros relacionados à busca
 	//arqsInv[2] --> A5-Idade.dat:   IDADE, PT, QTD
+	*qtdTotal = 0;
+    int pt=0, qtd=0, prox_idade=0, /*qtdTotal=0, */pos=0;
+    int idade=0;
+    rewind(arqsInv[0]);//A8
+    rewind(arqsInv[2]);//A5-IDADE
+
+    while(fread(&idade, sizeof(int), 1, arqsInv[2]) > 0){
+
+    	fread(&pt, sizeof(int), 1, arqsInv[2]);
+    	fread(&qtd, sizeof(int), 1, arqsInv[2]);
+
+    	if(idade<x){
+    		//quatidade total de resultados para o tamanho do vetor de resultados
+    		*qtdTotal += qtd;
+    	}
+    }
+
+    Dependente** dependentes = malloc((*qtdTotal)*sizeof(Dependente*));
+	for(int i=0; i< *qtdTotal; i++){
+		dependentes[i] = (Dependente *) malloc(sizeof(Dependente)); //malloc(sizeof(Empregado*));
+	}
+
+    rewind(arqsInv[2]);//A5-IDADE
+
+    while(fread(&idade, sizeof(int), 1, arqsInv[2]) > 0){
+
+    	fread(&pt, sizeof(int), 1, arqsInv[2]);
+    	fread(&qtd, sizeof(int), 1, arqsInv[2]);
+
+    	if(idade<x){
+
+    		fseek(arqsInv[0], (pt)*(tamanhoDependente() + sizeof(int)) , SEEK_SET);
+
+	    	//lendo todos os registros que atendem ao critério da busca
+	    	for(int i=0; i<qtd; i++){
+	    		fread(&dependentes[pos]->cod, sizeof(int), 1, arqsInv[0]);
+	            fread(dependentes[pos]->nome, sizeof(char), 50, arqsInv[0]);
+	            fread(&dependentes[pos]->idade, sizeof(int), 1, arqsInv[0]);
+	            fread(&dependentes[pos]->cod_emp, sizeof(int), 1, arqsInv[0]);
+
+	            //pula o prox_nome
+	            fseek(arqsInv[0],sizeof(int), SEEK_CUR);
+
+	            fread(&prox_idade, sizeof(int), 1, arqsInv[0]);
+	            //pula o prox_cod_emp
+	            fseek(arqsInv[0], sizeof(int), SEEK_CUR); 
+	          	fseek(arqsInv[0], (prox_idade)*(tamanhoDependente() + sizeof(int)), SEEK_SET);    //Indo para a prox idade
+	            //posição do vetor de empregados que será retornado
+	            pos++;
+	    	}
+    	}
+    }
+
+    if(*qtdTotal!=0){
+
+    	return dependentes;
+    }
+
+    return NULL;
+}
+
+//retorna um vetor com os dependentes de uma chave
+Dependente** buscaDependentesEmpDep(FILE** arqsInv, int codEmpregado, int *qtdTotal){
+
+	//qtdTotal: quantidade de registros relacionados à busca
+	//arqsInv[3] --> A5-Cod_emp-dep.dat:   COD EMPREGADO, PT, QTD
 	*qtdTotal = 0;
     int pt=0, qtd=0, prox_cod_emp=0, /*qtdTotal=0, */pos=0;
     int cod_emp=0;
@@ -391,7 +515,7 @@ Dependente** buscaDependentesEmpDep(FILE** arqsInv, int x, int *qtdTotal){
     	fread(&pt, sizeof(int), 1, arqsInv[3]);
     	fread(&qtd, sizeof(int), 1, arqsInv[3]);
 
-    	if(cod_emp==x){
+    	if(cod_emp==codEmpregado){
 
     		//quatidade total de resultados para o tamanho do vetor de resultados
     		*qtdTotal = qtd;
